@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Waiting</title>
+</head>
+<body>
+    <button onclick="window.open('/static/form.html', '_self')">
+        Home
+    </button>
+    <h1>Your position in the queue:</h1>
+    <h2 id="pos"></h2>
+    <button id="upd_btn" onclick="update()" style="height: 50px; width: 300px">
+        Update
+    </button>
+    <script>
+        update();
+        async function update() {
+            document.querySelector('#upd_btn').disabled = true;
+            setTimeout(() => document.querySelector('#upd_btn').disabled = false, 3000);
+            document.querySelector('#pos').textContent = await getInfo();
+        }
+        async function getInfo() {
+            let response = await fetch("/update");
+            if (response.status !== 200) {
+                open('/static/form.html', '_self')
+                return
+            }
+            response = await response.json();
+            if (response.code === 1) {
+                return response.position;
+            }
+            else if (response.code === 0) {
+                open('/static/result.html', '_self')
+                return
+            }
+            open('/static/result.html', '_self')
+        }
+    </script>
+</body>
+</html>

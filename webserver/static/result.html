@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+    <style>
+        .code {
+            width: 100%;
+            height: 500px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="window.open('/static/form.html', '_self')">
+        Home
+    </button>
+    <h1 id="desc">title</h1>
+    <p id="time" style="visibility: hidden">Time: 5s</p>
+    <div style="display: flex; width: 100%; justify-content: space-between; visibility: hidden" id="data">
+        <label style="flex-grow: 1">
+            Input:
+            <br>
+            <textarea id="input" class="code"></textarea>
+        </label>
+        <label style="flex-grow: 1">
+            Expected output:
+            <br>
+            <textarea id="expected" class="code"></textarea>
+        </label>
+        <label style="flex-grow: 1">
+            Your output:
+            <br>
+            <textarea id="output" class="code"></textarea>
+        </label>
+    </div>
+    <script>
+        getResult();
+        async function getResult() {
+            let resp = await fetch('/result');
+            if (resp.status !== 200) {
+                window.open('/static/form.html', '_self');
+                return
+            }
+
+            let data = await resp.json();
+            if (data.code === -1) {
+                document.querySelector('#desc').textContent = 'Error. ' + data.error;
+            } else if (data.code === 1) {
+                document.querySelector('#desc').textContent = 'Difference!';
+                document.querySelector('#time').textContent = 'Tests: ' + data.tests + '  Time: ' + data.time;
+                document.querySelector('#time').style.visibility = 'visible';
+                document.querySelector('#data').style.visibility = 'visible';
+                document.querySelector('#input').textContent = data.input;
+                document.querySelector('#expected').textContent = data.expected;
+                document.querySelector('#output').textContent = data.output;
+            } else if (data.code === 0) {
+                document.querySelector('#desc').textContent = 'OK';
+                document.querySelector('#time').textContent = 'Tests: ' + data.tests + '  Time: ' + data.time;
+                document.querySelector('#time').style.visibility = 'visible';
+            }
+        }
+    </script>
+</body>
+</html>
