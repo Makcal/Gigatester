@@ -19,23 +19,28 @@ MAX_DEPTH = 5
 p = 0.6
 
 
-def gen_expr(depth, max_depth):
-    if depth == max_depth:
-        return str(random.randint(1, 9))
-    r = random.random()
-    if r < 0.2:
-        s = f"{'max' if random.random() < 0.5 else 'min'} ( {gen_expr(depth+1, max_depth)} , {gen_expr(depth+1, max_depth)} )"
-    else:
-        s = str(random.randint(1, 9))
-    if random.random() < p:
-        s += f" {random.choice('+-*/')} {gen_expr(depth+1, max_depth)}"
-    return s
-
-
 def generate():
-    if random.random() < 0.05:
-        return gen_expr(0, 300)
-    return gen_expr(0, MAX_DEPTH)
+    if random.random() < 0.0:
+        n, m = random.randint(1, 10**5), random.randint(1, 10**5)
+    else:
+        n, m = random.randint(1, 20), random.randint(1, 20)
+    s = set()
+    alph = "abcdefgxyz"
+    for i in range((n+m)*10):
+        w = ""
+        for _ in range(random.randint(1, 8)):
+            w += random.choice(alph)
+        while w in s:
+            w = ""
+            for _ in range(random.randint(1, 8)):
+                w += random.choice(alph)
+        s.add(w)
+    s = list(s)
+    r = f"{n}\n"
+    r += " ".join(random.choices(s, k=n)) + "\n"
+    r += f"{m}\n"
+    r += " ".join(random.choices(s, k=m)) + "\n"
+    return r
 
 
 def run_test(n, test):
