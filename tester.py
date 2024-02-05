@@ -6,6 +6,7 @@ import time
 
 import docker
 import docker.errors
+from websockets import ConnectionClosed
 from websockets.sync.client import connect
 
 from gen_tests import generate
@@ -84,15 +85,20 @@ def do_test(file: str):
     return {'code': 0}
 
 
-# todo: auto reconnect
+SECRET = 'eb8d5498f143d53df55ce37fb3d944a3076f757b1268bfb4ce54959f3c2b5c1d'
+
+
 if __name__ == '__main__':
     while True:
         try:
             with connect("ws://0.0.0.0:80/ws") as ws:
-                ws.send('eb8d5498f143d53df55ce37fb3d944a3076f757b1268bfb4ce54959f3c2b5c1d')
-                print("Start scanning...", flush=True)
+                ws.send(SECRET)
+                if ws.recv(3) != 'ok':
+                    raise Exception("Connection error")
+                print("Connected. Start scanning...", flush=True)
                 while True:
                     time.sleep(3)
+                    ws.ping()
                     d = sorted(os.listdir('queue'))
                     if len(d) != 0:
                         f = d[0]
@@ -104,8 +110,20 @@ if __name__ == '__main__':
                         resp['tests'] = N_TESTS
                         os.remove('queue/' + f)
                         resp['user_id'] = user_id
-                        ws.send(json.dumps(resp))
+                        while True:
+                            try:
+                                ws.ping()
+                                ws.send(json.dumps(resp))
+                                break
+                            except ConnectionClosed as e:
+                                print("in", e)
+                                ws = connect("ws://0.0.0.0:80/ws")
+                                ws.send(SECRET)
+                                if ws.recv(3) != 'ok':
+                                    raise Exception("Connection error")
                         print("Done", flush=True)
+        except ConnectionClosed:
+            pass
         except Exception as e:
-            print(e)
+            print("out", e)
             time.sleep(3)

@@ -132,8 +132,8 @@ async def internal(ws: WebSocket):
                     results[user_id] = Result(**data)
                 else:
                     results[user_id] = Result(code=-1, error=data['error'])
-    except WebSocketDisconnect:
-        pass
+    except WebSocketDisconnect as e:
+        print(e)
 
 
 if __name__ == '__main__':
