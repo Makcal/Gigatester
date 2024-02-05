@@ -1,0 +1,11 @@
+[Unit]
+Require=gigaweb.service
+
+[Service]
+ExecStart=/root/gigatester/starttester.sh
+Restart=always
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
+

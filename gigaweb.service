@@ -1,0 +1,12 @@
+[Unit]
+Wants=network.target
+After=network-online.target
+
+[Service]
+ExecStart=/root/gigatester/startweb.sh
+Restart=always
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
+
