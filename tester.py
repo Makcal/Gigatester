@@ -12,7 +12,7 @@ from gen_tests import generate
 
 docker_engine = docker.DockerClient()
 
-N_TESTS = 200
+N_TESTS = 100
 MAIN_CLASS = 'Main'
 
 
@@ -84,11 +84,13 @@ def do_test(file: str):
     return {'code': 0}
 
 
+# todo: auto reconnect
 if __name__ == '__main__':
     while True:
         try:
             with connect("ws://0.0.0.0:80/ws") as ws:
                 ws.send('eb8d5498f143d53df55ce37fb3d944a3076f757b1268bfb4ce54959f3c2b5c1d')
+                print("Start scanning...", flush=True)
                 while True:
                     time.sleep(3)
                     d = sorted(os.listdir('queue'))
@@ -96,11 +98,14 @@ if __name__ == '__main__':
                         f = d[0]
                         user_id = re.match('[0-9]+_([0-9a-f]{64}).txt', f).groups()[0]
                         t1 = time.time()
+                        print(f"Do for {user_id}", flush=True)
                         resp = do_test(f)
                         resp['time'] = time.time() - t1
                         resp['tests'] = N_TESTS
                         os.remove('queue/' + f)
                         resp['user_id'] = user_id
                         ws.send(json.dumps(resp))
-        except Exception:
+                        print("Done", flush=True)
+        except Exception as e:
+            print(e)
             time.sleep(3)

@@ -114,20 +114,26 @@ def result(user_id: Annotated[str, Cookie()] = None):
 
 @app.websocket("/ws")
 async def internal(ws: WebSocket):
-    await ws.accept()
-    token = await ws.receive_text()
-    if token != SECRET:
-        await ws.close()
-    while True:
-        data = await ws.receive_json()
-        code = data['code']
-        user_id = data['user_id']
-        if user_id in queue:
-            queue.remove(user_id)
-            if code == 0 or code == 1:
-                results[user_id] = Result(**data)
-            else:
-                results[user_id] = Result(code=-1, error=data['error'])
+    try:
+        await ws.accept()
+        token = await ws.receive_text()
+        if token != SECRET:
+            print("Bad token", flush=True)
+            await ws.close()
+        await ws.send_text("ok")
+        print("WS connected", flush=True)
+        while True:
+            data = await ws.receive_json()
+            code = data['code']
+            user_id = data['user_id']
+            if user_id in queue:
+                queue.remove(user_id)
+                if code == 0 or code == 1:
+                    results[user_id] = Result(**data)
+                else:
+                    results[user_id] = Result(code=-1, error=data['error'])
+    except WebSocketDisconnect:
+        pass
 
 
 if __name__ == '__main__':
