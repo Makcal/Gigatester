@@ -32,7 +32,7 @@ public final class Main {
         for (String r : ss) {
             if (c.contains(r) || a.contains(r)) continue;
             c.add(r);
-            l.put(r);
+            l.add(r);
         }
         System.out.println(l.size());
         for (String r : l) {
