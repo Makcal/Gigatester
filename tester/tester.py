@@ -18,7 +18,7 @@ MAIN_CLASS = 'Main'
 
 
 def do_test(file: str):
-    shutil.copyfile('run.sh', 'data/run.sh')
+    shutil.copyfile('../chore/run.sh', 'data/run.sh')
     for i in range(N_TESTS):
         fin = open(f'data/input{i}.txt', 'w')
         test = generate()
@@ -99,7 +99,7 @@ if __name__ == '__main__':
                 while True:
                     time.sleep(3)
                     ws.ping()
-                    d = sorted(os.listdir('queue'))
+                    d = sorted(os.listdir('../queue'))
                     if len(d) != 0:
                         f = d[0]
                         user_id = re.match('[0-9]+_([0-9a-f]{64}).txt', f).groups()[0]

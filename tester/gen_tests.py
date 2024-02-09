@@ -20,12 +20,8 @@ p = 0.6
 
 
 def generate():
-    if random.random() < 0.2:
-        n, m = random.randint(1, 10**5), random.randint(1, 10**5)
-        bb = 1
-    else:
-        n, m = random.randint(1, 20), random.randint(1, 20)
-        bb = 0
+    n, m = random.randint(1, 20), random.randint(1, 20)
+    bb = 0
     s = set()
     alph = "abcdefgxyz"
     for i in range((n+m)*10 if not bb else (n+m)*2):
@@ -40,8 +36,6 @@ def generate():
     s = list(s)
     r = f"{n}\n"
     r += " ".join(random.choices(s, k=n)) + "\n"
-    r += f"{m}\n"
-    r += " ".join(random.choices(s, k=m)) + "\n"
     return r
 
 
