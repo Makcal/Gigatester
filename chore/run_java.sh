@@ -1,3 +1,6 @@
+# $1 - a number of tests
+# $2 - a path to the source file
+# $3 - a name of the main class
 cd /work
 cp "$2" /work/"$3".java
 javac /work/"$3".java
