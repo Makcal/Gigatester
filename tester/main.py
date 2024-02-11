@@ -65,6 +65,7 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
             expected = task.default_tester.start(task.n_tests, task.reference_file, task.timeout)
             output = tester.start(task.n_tests, pathlib.Path().absolute().joinpath('queue', file), task.timeout)
         except MyContainerError as e:
+            print("ContainerError", e)
             return {'code': -1, 'error': e.message}
         except MyTimeoutError:
             return {'code': 2}
