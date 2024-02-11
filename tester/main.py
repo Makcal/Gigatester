@@ -9,8 +9,8 @@ from websockets import ConnectionClosed
 from websockets.sync.client import connect
 
 from exceptions import MyContainerError, MyTimeoutError
-from tasks import Task, week3A
-from testers import AbsTester, java_tester
+from tasks import Task, TASK_DICT
+from testers import AbsTester, TESTER_DICT
 
 
 def compare(output: list[str], expected: list[str], n) -> tuple[bool, dict[str, any]]:
@@ -79,14 +79,22 @@ def main():
                     queue = sorted(os.listdir('queue'))
                     if len(queue) != 0:
                         first = queue[0]
-                        user_id = re.match('[0-9]+_([0-9a-f]{64}).txt', first).groups()[0]
+                        # timestamp, user id, task, language
+                        query_info = re.match('[0-9]+_([0-9a-f]{64})_([a-zA-Z0-9]+)_([a-z]+).txt', first).groups()
+                        user_id = query_info[0]
+                        task = TASK_DICT[query_info[1]]
+                        tester = TESTER_DICT[query_info[2]]
 
                         time_start = time.time()
                         print(f"Do for {user_id}", flush=True)
-                        resp = do_test(first, java_tester, week3A)
+                        resp = do_test(first, tester, task)
+
+                        resp['task'] = query_info[1]
+                        resp['language'] = query_info[2]
                         resp['time'] = time.time() - time_start
-                        os.remove('queue/' + first)
                         resp['user_id'] = user_id
+                        os.remove('queue/' + first)
+
                         while True:
                             try:
                                 ws.ping()
@@ -99,10 +107,12 @@ def main():
                                 if ws.recv(3) != 'ok':
                                     raise Exception("Connection error")
                         print("Done", flush=True)
+
                     time.sleep(3)
         except ConnectionClosed:
             pass
         except KeyboardInterrupt:
+            ws.close(reason="KeyboardInterrupt")
             print()
             exit()
         except Exception as e:

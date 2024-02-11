@@ -3,11 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Submit solution</title>
+    <style>
+        .select {
+            margin: 5px 0;
+            height: 22px;
+        }
+        label {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        select {
+            height: 100%;
+            padding: 2px;
+        }
+    </style>
 </head>
 <body>
     <form action="/submit" method="post" enctype="multipart/form-data">
         <h1>Paste your program here:</h1>
-        <textarea name="program" style="width: 80%; min-height: 500px"></textarea>
+        <div class="select">
+            <label for="tasks">Task: </label>
+            <select id="tasks" name="task">
+                <option value="week3A">Week 3. Task A.</option>
+                <option value="week3B">Week 3. Task B.</option>
+            </select>
+        </div>
+        <div class="select">
+            <label for="languages">Language: </label>
+            <select id="languages" name="language">
+                <option value="java">Java 23</option>
+                <option value="cpp">C++ 20</option>
+            </select>
+        </div>
+        <label>
+            <textarea name="program" style="margin: 10px 0; width: 80%; min-height: 500px"></textarea>
+        </label>
         <br>
         <input type="submit" style="width: 10em; height: 2em">
     </form>

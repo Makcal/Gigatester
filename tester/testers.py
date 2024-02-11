@@ -98,5 +98,8 @@ class JavaTester(AbsTester):
 _docker_engine = docker.DockerClient(base_url='unix://home/max/.docker/desktop/docker.sock')
 
 java_tester = JavaTester(pathlib.Path().absolute(), _docker_engine)
+TESTER_DICT: dict[str, AbsTester] = {
+    'java': java_tester,
+}
 
-__all__ = ['AbsTester', 'java_tester']
+__all__ = ['AbsTester', 'TESTER_DICT']
