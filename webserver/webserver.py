@@ -27,9 +27,9 @@ class Result(pydantic.BaseModel):
     error: str | None = None
     time: float | None = None
     tests: int | None = None
-    input: str | None = None
-    expected: str | None = None
-    output: str | None = None
+    input: list[str] | None = None
+    expected: list[str] | None = None
+    output: list[str] | None = None
     language: str | None = None
     task: str | None = None
 

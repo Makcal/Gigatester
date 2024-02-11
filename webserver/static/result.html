@@ -18,6 +18,10 @@
         .info_label {
             margin-right: 20px;
         }
+        .text_block {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -45,21 +49,21 @@
         </p>
     </div>
 
-    <div style="display: flex; width: 100%; justify-content: space-between; visibility: hidden" id="data">
-        <label style="flex-grow: 1">
+    <div style="display: flex; width: 100%; justify-content: space-between; visibility: hidden" class="data">
+        <label class="text_block">
             Input:
             <br>
-            <textarea id="input" class="code"></textarea>
+            <textarea class="input code"></textarea>
         </label>
-        <label style="flex-grow: 1">
+        <label class="text_block">
             Expected output:
             <br>
-            <textarea id="expected" class="code"></textarea>
+            <textarea class="expected code"></textarea>
         </label>
-        <label style="flex-grow: 1">
+        <label class="text_block">
             Your output:
             <br>
-            <textarea id="output" class="code"></textarea>
+            <textarea class="output code"></textarea>
         </label>
     </div>
 
@@ -86,10 +90,19 @@
                 setTime(data.time);
                 setTests(data.tests);
 
-                document.querySelector('#data').style.visibility = 'visible';
-                document.querySelector('#input').textContent = data.input.replaceAll('\n', '\r\n');
-                document.querySelector('#expected').textContent = data.expected.replaceAll('\n', '\r\n');
-                document.querySelector('#output').textContent = data.output.replaceAll('\n', '\r\n');
+                document.querySelector('.data').style.visibility = 'visible';
+                document.querySelector('.input').textContent = data.input[0].replaceAll('\n', '\r\n');
+                document.querySelector('.expected').textContent = data.expected[0].replaceAll('\n', '\r\n');
+                document.querySelector('.output').textContent = data.output[0].replaceAll('\n', '\r\n');
+                let last = document.querySelector('.data');
+                for (let i = 1; i < data.input.length; i++) {
+                    let new_block = last.cloneNode(true);
+                    new_block.querySelector('.input').textContent = data.input[i].replaceAll('\n', '\r\n');
+                    new_block.querySelector('.expected').textContent = data.expected[i].replaceAll('\n', '\r\n');
+                    new_block.querySelector('.output').textContent = data.output[i].replaceAll('\n', '\r\n');
+                    last.after(new_block);
+                    last = new_block;
+                }
             } else if (data.code === 0) {
                 setHeader('OK');
                 setTime(data.time);

@@ -14,6 +14,10 @@ from testers import AbsTester, TESTER_DICT
 
 
 def compare(output: list[str], expected: list[str], n) -> tuple[bool, dict[str, any]]:
+    different_inputs = []
+    different_outputs = []
+    different_expected = []
+    different = False
     for i in range(n):
         test_output = output[i]
         test_expected = expected[i]
@@ -21,7 +25,16 @@ def compare(output: list[str], expected: list[str], n) -> tuple[bool, dict[str, 
             fin = open(f'data/input{i}.txt')
             test = fin.read()
             fin.close()
-            return False, {'code': 1, 'input': test, 'expected': test_expected, 'output': test_output, 'tests': n}
+
+            different = True
+            different_inputs.append(test)
+            different_outputs.append(test_output)
+            different_expected.append(test_expected)
+    if different:
+        return False, {'code': 1,
+                       'input': different_inputs,
+                       'expected': different_expected,
+                       'output': different_outputs, 'tests': n}
     return True, {'code': 0, 'tests': n}
 
 
