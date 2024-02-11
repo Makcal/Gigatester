@@ -8,8 +8,9 @@ from pathlib import Path
 
 import docker
 import docker.errors
+from docker.models.containers import Container
 
-from exceptions import MyContainerError
+from exceptions import MyContainerError, MyTimeoutError
 
 
 class AbsTester(ABC):
@@ -42,19 +43,34 @@ class JavaTester(AbsTester):
         shutil.copyfile(file_name, self.local('prog', 'Main.java'))
 
         try:
-            self.docker.containers.run(
+            d: Container = self.docker.containers.run(
                 'openjdk:23-slim-bullseye',
-                remove=True, network_mode='none', working_dir='/work', stderr=True,
+                detach=True, network_mode='none', working_dir='/work', stderr=True,
                 volumes=[f'{self.local("prog")}:/prog:ro',
                          f'{self.local("data")}:/data'],
                 command=f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main'
             )
+            t1 = time.time()
+            while d.status != 'exited':
+                d.reload()
+                time.sleep(1)
+                if time.time() - t1 > timeout:
+                    d.stop(timeout=5)
+                    raise MyTimeoutError()
+
+            if d.logs():
+                raise MyContainerError(d.logs().decode())
 
             output = []
             for i in range(n_tests):
                 file = open(self.local('data', f'output{i}.txt'))
                 output.append(file.read().strip())
                 file.close()
+
+            # i will be happy if someone explain me why the second container does not produce output without a delay
+            # todo: check on the server
+            time.sleep(5)
+
             return output
 
         except docker.errors.ContainerError as e:
@@ -69,6 +85,14 @@ class JavaTester(AbsTester):
                     raise MyContainerError(error_message)
                 except IOError:
                     raise MyContainerError("Unknown error.")
+
+        finally:
+            if 'd' in locals():
+                try:
+                    # noinspection PyUnboundLocalVariable
+                    d.remove()
+                except docker.errors.NotFound:
+                    pass
 
 
 _docker_engine = docker.DockerClient(base_url='unix://home/max/.docker/desktop/docker.sock')

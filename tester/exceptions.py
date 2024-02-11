@@ -5,3 +5,7 @@ class MyException(Exception):
 class MyContainerError(MyException):
     def __init__(self, message):
         self.message = message
+
+
+class MyTimeoutError(MyException):
+    pass
