@@ -13,7 +13,19 @@ from tasks import Task, week3A
 from testers import AbsTester, java_tester
 
 
-def do_test(file: str, tester: AbsTester, task: Task):
+def compare(output: list[str], expected: list[str], n):
+    for i in range(n):
+        test_output = output[i]
+        test_expected = expected[i]
+        if test_output != test_expected:
+            fin = open(f'data/input{i}.txt')
+            test = fin.read()
+            fin.close()
+            return False, {'code': 1, 'input': test, 'expected': test_expected, 'output': test_output}
+    return True, {'code': 0}
+
+
+def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
     try:
         shutil.rmtree(pathlib.Path().absolute().joinpath('data'))
         pathlib.Path().absolute().joinpath('data').mkdir()
@@ -24,28 +36,22 @@ def do_test(file: str, tester: AbsTester, task: Task):
             fin.close()
 
         try:
+            first_expected = task.default_tester.start(1, task.reference_file, 6)
+            time.sleep(5)
+            first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 6)
+            res = compare(first_output, first_expected, 1)
+            if not res[0]:
+                return res[1]
+
             expected = task.default_tester.start(task.n_tests, task.reference_file, task.timeout)
-        except MyContainerError as e:
-            return {'code': -1, 'error': e.message}
-
-        # i will be happy if someone explain me why the second container does not produce output without a delay
-        # todo: check on the server
-        time.sleep(7)
-
-        try:
+            # i will be happy if someone explain me why the second container does not produce output without a delay
+            # todo: check on the server
+            time.sleep(5)
             output = tester.start(task.n_tests, pathlib.Path().absolute().joinpath('queue', file), task.timeout)
         except MyContainerError as e:
             return {'code': -1, 'error': e.message}
 
-        for i in range(task.n_tests):
-            test_output = output[i]
-            test_expected = expected[i]
-            if test_output != test_expected:
-                fin = open(f'data/input{i}.txt')
-                test = fin.read()
-                fin.close()
-                return {'code': 1, 'input': test, 'expected': test_expected, 'output': test_output}
-        return {'code': 0}
+        return compare(output, expected, task.n_tests)[1]
 
     except Exception as e:
         print("Critical error", type(e), e)
@@ -92,6 +98,9 @@ def main():
                     time.sleep(3)
         except ConnectionClosed:
             pass
+        except KeyboardInterrupt:
+            print()
+            exit()
         except Exception as e:
             print("out_error", type(e), e)
             time.sleep(3)
