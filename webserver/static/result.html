@@ -10,7 +10,7 @@
         .code {
             width: 100%;
             height: 500px;
-            white-space: nowrap;
+            white-space: pre;
         }
         p {
             margin: 0;
@@ -87,9 +87,9 @@
                 setTests(data.tests);
 
                 document.querySelector('#data').style.visibility = 'visible';
-                document.querySelector('#input').textContent = data.input;
-                document.querySelector('#expected').textContent = data.expected;
-                document.querySelector('#output').textContent = data.output;
+                document.querySelector('#input').textContent = data.input.replaceAll('\n', '\r\n');
+                document.querySelector('#expected').textContent = data.expected.replaceAll('\n', '\r\n');
+                document.querySelector('#output').textContent = data.output.replaceAll('\n', '\r\n');
             } else if (data.code === 0) {
                 setHeader('OK');
                 setTime(data.time);
