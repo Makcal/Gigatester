@@ -133,8 +133,8 @@ def main():
                         print("Done", flush=True)
 
                     time.sleep(3)
-        except ConnectionClosed:
-            pass
+        except ConnectionClosed as e:
+            print("Connection closed", e)
         except KeyboardInterrupt:
             ws.close(reason="KeyboardInterrupt")
             print()
