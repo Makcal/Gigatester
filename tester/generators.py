@@ -71,5 +71,6 @@ class GeneratorWeek4A(AbsGenerator):
             r = random.randint(0, 10**6)
             while r in s:
                 r = random.randint(0, 10 ** 6)
+            s.add(r)
             test += f"{r} {self.gen_name()} {self.gen_name()}\n"
         return test
