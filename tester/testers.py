@@ -67,9 +67,10 @@ class JavaTester(AbsTester):
                 output.append(file.read().strip())
                 file.close()
 
-            # i will be happy if someone explain me why the second container does not produce output without a delay
-            # todo: check on the server
-            time.sleep(5)
+            # I will be happy if someone explain to me why the second container does not produce output without a delay
+            # works fine on the server
+            if os.getenv('DEBUG'):
+                time.sleep(5)
 
             return output
 
@@ -125,9 +126,10 @@ class CppTester(AbsTester):
                 output.append(file.read().strip())
                 file.close()
 
-            # i will be happy if someone explain me why the second container does not produce output without a delay
-            # todo: check on the server
-            time.sleep(5)
+            # I will be happy if someone explain to me why the second container does not produce output without a delay
+            # works fine on the server
+            if os.getenv('DEBUG'):
+                time.sleep(5)
 
             return output
 
@@ -153,7 +155,10 @@ class CppTester(AbsTester):
                     pass
 
 
-_docker_engine = docker.DockerClient(base_url='unix://home/max/.docker/desktop/docker.sock')
+if os.getenv('DEBUG'):
+    _docker_engine = docker.DockerClient(base_url='unix://home/max/.docker/desktop/docker.sock')
+else:
+    _docker_engine = docker.DockerClient()
 
 java_tester = JavaTester(pathlib.Path().absolute(), _docker_engine)
 cpp_tester = CppTester(pathlib.Path().absolute(), _docker_engine)
