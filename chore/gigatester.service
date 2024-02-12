@@ -2,7 +2,7 @@
 Require=gigaweb.service
 
 [Service]
-ExecStart=/root/gigatester/starttester.sh
+ExecStart=/root/gigatester/chore/starttester.sh
 Restart=always
 TimeoutStopSec=10
 
