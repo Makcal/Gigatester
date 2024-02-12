@@ -47,8 +47,13 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
     2 - timeout error
     """
     try:
-        shutil.rmtree(pathlib.Path().absolute().joinpath('data'))
+        try:
+            shutil.rmtree(pathlib.Path().absolute().joinpath('data'))
+            shutil.rmtree(pathlib.Path().absolute().joinpath('prog'))
+        except FileNotFoundError:
+            pass
         pathlib.Path().absolute().joinpath('data').mkdir()
+        pathlib.Path().absolute().joinpath('prog').mkdir()
         for i in range(task.n_tests):
             fin = open(f'data/input{i}.txt', 'w')
             test = task.generator.generate()
