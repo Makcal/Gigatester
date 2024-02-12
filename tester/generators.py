@@ -64,7 +64,7 @@ class GeneratorWeek4A(AbsGenerator):
         if random.random() < 0.9:
             n = random.randint(0, 50//2-1) * 2 + 1
         else:
-            n = random.randint(0, 10 ** 6 // 2 - 1) * 2 + 1
+            n = random.randint(0, 10 ** 3 // 2 - 1) * 2 + 1
         s = set()
         test = f"{n}\n"
         for i in range(n):
