@@ -110,7 +110,7 @@ def main():
                         tester = TESTER_DICT[query_info[2]]
 
                         time_start = time.time()
-                        print(f"Do for {user_id}", flush=True)
+                        print(f"Do {query_info[1]} on {query_info[2]} for {user_id}", flush=True)
                         resp = do_test(first, tester, task)
 
                         resp['task'] = query_info[1]
