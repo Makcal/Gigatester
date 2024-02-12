@@ -12,7 +12,7 @@ import pydantic
 
 
 LANGUAGES = Literal['java', 'cpp']
-LANGUAGE_NAMES = {'java': 'Java 23', 'cpp': 'C++ 17'}
+LANGUAGE_NAMES = {'java': 'Java 23', 'cpp': 'GCC C++ 17'}
 TASKS = Literal['week3A', 'week3B']
 TASK_NAMES = {'week3A': 'Week 3. Task A.', 'week3B': 'Week 3. Task B.'}
 
