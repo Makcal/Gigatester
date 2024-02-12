@@ -1,7 +1,7 @@
 import pathlib
 import typing
 
-from generators import GeneratorWeek3A, GeneratorWeek3B
+from generators import GeneratorWeek3A, GeneratorWeek3B, GeneratorWeek4A
 from testers import java_tester
 
 if typing.TYPE_CHECKING:
@@ -20,9 +20,11 @@ class Task:
 
 week3A = Task(GeneratorWeek3A(), ('week3A.java', java_tester), 100, 60)
 week3B = Task(GeneratorWeek3B(), ('week3B.java', java_tester), 100, 60)
+week4A = Task(GeneratorWeek4A(), ('week4A.java', java_tester), 50, 60)
 TASK_DICT: dict[str, Task] = {
     'week3A': week3A,
     'week3B': week3B,
+    'week4A': week4A,
 }
 
 __all__ = ['Task', 'TASK_DICT']

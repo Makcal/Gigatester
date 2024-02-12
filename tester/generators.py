@@ -49,3 +49,27 @@ class GeneratorWeek3B(AbsGenerator):
         r += f"{m}\n"
         r += " ".join(random.choices(s, k=m)) + "\n"
         return r
+
+
+class GeneratorWeek4A(AbsGenerator):
+    def gen_name(self):
+        alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+        n = random.randint(1, 10)
+        s = ""
+        for i in range(n):
+            s += alphabet[random.randint(0, len(alphabet)-1)]
+        return s
+
+    def generate(self) -> str:
+        if random.random() < 0.9:
+            n = random.randint(0, 50//2-1) * 2 + 1
+        else:
+            n = random.randint(0, 10 ** 6 // 2 - 1) * 2 + 1
+        s = set()
+        test = f"{n}\n"
+        for i in range(n):
+            r = random.randint(0, 10**6)
+            while r in s:
+                r = random.randint(0, 10 ** 6)
+            test += f"{r} {self.gen_name()} {self.gen_name()}\n"
+        return test
