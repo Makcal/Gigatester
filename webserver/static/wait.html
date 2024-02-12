@@ -3,6 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Waiting</title>
+    <style>
+        #upd_btn {
+            background: none;
+            height: 200px;
+            width: 200px;
+            border: 5px solid #525252;
+            border-radius: 1000px;
+            position: relative;
+            animation-name: rotate;
+            animation-timing-function: ease-in-out;
+            animation-play-state: paused;
+            animation-iteration-count: infinite;
+            animation-duration: 3s;
+            transition: color 0.5s, border-color 0.5s;
+        }
+        #upd_btn:disabled {
+            border-color: #7b7979;
+        }
+        #upd_img {
+            height: 200px;
+            width: 200px;
+            position: absolute;
+            top: 6px;
+            left: -3px;
+            transform: rotate(25deg);
+        }
+        #upd_text {
+            position: relative;
+            z-index: 10;
+            font-size: 1.5em;
+            background: #c0bebe9e;
+            border-radius: 20px;
+            padding: 5px 10px;
+            text-shadow: -7px -2px 12px white;
+        }
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 <body>
     <button onclick="window.open('/static/form.html', '_self')">
@@ -10,8 +54,9 @@
     </button>
     <h1>Your position in the queue:</h1>
     <h2 id="pos"></h2>
-    <button id="upd_btn" onclick="update()" style="height: 50px; width: 300px">
-        Update
+    <button id="upd_btn" onclick="update()">
+        <span id="upd_text">Update</span>
+        <img id="upd_img" src="/static/melon.png" alt="">
     </button>
     <script>
         update();
@@ -27,7 +72,14 @@
                 return
             }
             response = await response.json();
+            let button = document.querySelector('#upd_btn');
             if (response.code === 1) {
+                button.style.animationPlayState = 'running';
+                button.disabled = true;
+                setTimeout(() => {
+                    button.style.animationPlayState = 'paused';
+                    button.disabled = false;
+                }, 3000);
                 return response.position;
             }
             else if (response.code === 0) {
