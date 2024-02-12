@@ -77,8 +77,12 @@
                 button.style.animationPlayState = 'running';
                 button.disabled = true;
                 setTimeout(() => {
+                    button.style
                     button.style.animationPlayState = 'paused';
                     button.disabled = false;
+                    button.style.animation = 'none';
+                    button.offsetHeight; /* trigger reflow */
+                    button.style.animation = null;
                 }, 3000);
                 return response.position;
             }
