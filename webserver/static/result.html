@@ -121,12 +121,20 @@
             <span id="language"></span>
         </p>
         <p style="visibility: hidden">
+            <span class="info_label">Time: </span>
+            <span id="time"></span>
+        </p>
+        <p style="visibility: hidden">
             <span class="info_label">Tests: </span>
             <span id="tests"></span>
         </p>
         <p style="visibility: hidden">
-            <span class="info_label">Time: </span>
-            <span id="time"></span>
+            <span class="info_label">Successful: </span>
+            <span id="tests_successful"></span>
+        </p>
+        <p style="visibility: hidden">
+            <span class="info_label">Failed: </span>
+            <span id="tests_failed"></span>
         </p>
     </div>
 
@@ -169,7 +177,7 @@
             } else if (data.code === 1) {
                 setHeader('Difference!');
                 setTime(data.time);
-                setTests(data.tests);
+                setTests(parseInt(data.tests), data.input.length);
 
                 document.querySelector('.data').style.visibility = 'visible';
                 document.querySelector('.input').textContent = data.input[0].replaceAll('\n', '\r\n');
@@ -189,7 +197,7 @@
             } else if (data.code === 0) {
                 setHeader('OK');
                 setTime(data.time);
-                setTests(data.tests);
+                setTests(data.tests, 0);
 
                 let an = Math.floor(7 + Math.random() * 30);
                 let melon = document.querySelector('.melon');
@@ -224,9 +232,13 @@
             document.querySelector('#time').parentElement.style.visibility = 'visible';
             document.querySelector('#time').textContent = text;
         }
-        function setTests(text) {
+        function setTests(total, failed) {
             document.querySelector('#tests').parentElement.style.visibility = 'visible';
-            document.querySelector('#tests').textContent = text;
+            document.querySelector('#tests').textContent = total.toString();
+            document.querySelector('#tests_successful').parentElement.style.visibility = 'visible';
+            document.querySelector('#tests_successful').textContent = (total - failed).toString();
+            document.querySelector('#tests_failed').parentElement.style.visibility = 'visible';
+            document.querySelector('#tests_failed').textContent = failed.toString();
         }
     </script>
 </body>
