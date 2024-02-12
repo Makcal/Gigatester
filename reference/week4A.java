@@ -10,7 +10,7 @@ public final class Main {
         ArrayList<A> ar = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             int r = s.nextInt();
-            String ss = s.nextLine();
+            String ss = s.next() + " " + s.next();
             A a = new A();
             a.n = r;
             a.s = ss;
