@@ -101,6 +101,8 @@ async def form(background_tasks: BackgroundTasks,
         raise HTTPException(400, "No input")
 
     response = RedirectResponse("/static/wait.html", status.HTTP_302_FOUND)
+    response.set_cookie('task', task)
+    response.set_cookie('language', language)
     if user_id not in queue:
         if len(queue) >= MAX_QUEUE:
             raise HTTPException(503, "Busy")
