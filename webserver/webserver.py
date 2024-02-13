@@ -77,15 +77,15 @@ async def reg(request: Request, call_next):
         return await call_next(request)
 
     if user_id is None:
-        regs[request.client.host] += 1
-        if regs[request.client.host] >= MAX_REG and request.client.host not in ban_list:
-            ban_list.append(request.client.host)
-            return RedirectResponse("/static/form.html", status.HTTP_302_FOUND)
-        else:
-            user_id = random.randbytes(32).hex()
-            response = RedirectResponse(request.url)
-            response.set_cookie('user_id', user_id)
-            return response
+        # regs[request.client.host] += 1
+        # if regs[request.client.host] >= MAX_REG and request.client.host not in ban_list:
+        #     ban_list.append(request.client.host)
+        #     return RedirectResponse("/static/form.html", status.HTTP_302_FOUND)
+        # else:
+        user_id = random.randbytes(32).hex()
+        response = RedirectResponse(request.url)
+        response.set_cookie('user_id', user_id)
+        return response
 
 """
 API
