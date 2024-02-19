@@ -8,6 +8,7 @@ import time
 from websockets import ConnectionClosed
 from websockets.sync.client import connect
 
+from checkers import AbsChecker
 from exceptions import MyContainerError, MyTimeoutError
 from generators import AbsGenerator
 from tasks import Task, TASK_DICT
@@ -29,19 +30,18 @@ def generate(generator: AbsGenerator, n: int):
         fin.close()
 
 
-def compare(output: list[str], expected: list[str], n) -> tuple[bool, dict[str, any]]:
+def compare(checker: AbsChecker, output: list[str], expected: list[str], n) -> tuple[bool, dict[str, any]]:
     different_inputs = []
     different_outputs = []
     different_expected = []
     different = False
     for i in range(n):
+        with open(f'data/input{i}.txt') as fin:
+            test = fin.read()
         test_output = output[i]
         test_expected = expected[i]
-        if test_output != test_expected:
-            fin = open(f'data/input{i}.txt')
-            test = fin.read()
-            fin.close()
 
+        if not checker.check(test_expected, test_output, test):
             different = True
             different_inputs.append(test)
             different_outputs.append(test_output)
@@ -67,7 +67,7 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
             generate(task.generator, 1)
             first_expected = task.default_tester.start(1, task.reference_file, 10)
             first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 10)
-            first_res = compare(first_output, first_expected, 1)
+            first_res = compare(task.checker, first_output, first_expected, 1)
             if not first_res[0]:
                 return first_res[1]
 
@@ -80,7 +80,7 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
         except MyTimeoutError:
             return {'code': 2}
 
-        return compare(output, expected, task.n_tests)[1]
+        return compare(task.checker, output, expected, task.n_tests)[1]
 
     except Exception as e:
         print("Critical error", type(e), e)
