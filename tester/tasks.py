@@ -2,7 +2,7 @@ import pathlib
 import typing
 
 from generators import GeneratorWeek3A, GeneratorWeek3B, GeneratorWeek4A
-from testers import java_tester, cpp_tester
+from testers import TESTER_DICT
 
 if typing.TYPE_CHECKING:
     from generators import AbsGenerator
@@ -18,9 +18,9 @@ class Task:
         self.timeout = timeout
 
 
-week3A = Task(GeneratorWeek3A(), ('week3A.java', java_tester), 100, 60)
-week3B = Task(GeneratorWeek3B(), ('week3B.java', java_tester), 100, 60)
-week4A = Task(GeneratorWeek4A(), ('week4A.cpp', cpp_tester), 60, 60)
+week3A = Task(GeneratorWeek3A(), ('week3A.java', TESTER_DICT['java']), 100, 60)
+week3B = Task(GeneratorWeek3B(), ('week3B.java', TESTER_DICT['java']), 100, 60)
+week4A = Task(GeneratorWeek4A(), ('week4A.cpp', TESTER_DICT['cpp']), 60, 60)
 TASK_DICT: dict[str, Task] = {
     'week3A': week3A,
     'week3B': week3B,
