@@ -3,13 +3,15 @@ from abc import ABC, abstractmethod
 
 
 class AbsGenerator(ABC):
+    @staticmethod
     @abstractmethod
-    def generate(self) -> str:
+    def generate() -> str:
         pass
 
 
 class GeneratorWeek3A(AbsGenerator):
-    def generate(self) -> str:
+    @staticmethod
+    def generate() -> str:
         n, m = random.randint(1, 20), random.randint(1, 20)
         s = set()
         alph = 'abcdefgxy'
@@ -29,7 +31,8 @@ class GeneratorWeek3A(AbsGenerator):
 
 
 class GeneratorWeek3B(AbsGenerator):
-    def generate(self) -> str:
+    @staticmethod
+    def generate() -> str:
         n, m = random.randint(1, 20), random.randint(1, 20)
         bb = 0
         s = set()
@@ -52,7 +55,8 @@ class GeneratorWeek3B(AbsGenerator):
 
 
 class GeneratorWeek4A(AbsGenerator):
-    def gen_name(self):
+    @staticmethod
+    def gen_name():
         alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
         n = random.randint(1, 10)
         s = ""
@@ -60,7 +64,8 @@ class GeneratorWeek4A(AbsGenerator):
             s += alphabet[random.randint(0, len(alphabet)-1)]
         return s
 
-    def generate(self) -> str:
+    @staticmethod
+    def generate() -> str:
         if random.random() < 0.9:
             n = random.randint(0, 50//2-1) * 2 + 1
         else:
@@ -72,5 +77,5 @@ class GeneratorWeek4A(AbsGenerator):
             while r in s:
                 r = random.randint(0, 10 ** 6)
             s.add(r)
-            test += f"{r} {self.gen_name()} {self.gen_name()}\n"
+            test += f"{r} {GeneratorWeek4A.gen_name()} {GeneratorWeek4A.gen_name()}\n"
         return test
