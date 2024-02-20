@@ -1,6 +1,8 @@
 import random
 from abc import ABC, abstractmethod
 
+eng_alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+
 
 class AbsGenerator(ABC):
     @staticmethod
@@ -57,11 +59,10 @@ class GeneratorWeek3B(AbsGenerator):
 class GeneratorWeek4A(AbsGenerator):
     @staticmethod
     def gen_name():
-        alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
         n = random.randint(1, 10)
         s = ""
         for i in range(n):
-            s += alphabet[random.randint(0, len(alphabet)-1)]
+            s += eng_alphabet[random.randint(0, len(eng_alphabet)-1)]
         return s
 
     @staticmethod
@@ -79,3 +80,48 @@ class GeneratorWeek4A(AbsGenerator):
             s.add(r)
             test += f"{r} {GeneratorWeek4A.gen_name()} {GeneratorWeek4A.gen_name()}\n"
         return test
+
+
+class GeneratorWeek5A(AbsGenerator):
+    @staticmethod
+    def gen_word():
+        len_ = random.randint(1, 16)
+        s = ""
+        for j in range(len_):
+            s += random.choice(eng_alphabet)
+        return s
+
+    @staticmethod
+    def generate() -> str:
+        small = random.random() < 0.6
+        n = random.randint(1, 10 if small else 1000)
+        words = set()
+        ml = -1
+        for i in range(n):
+            s = GeneratorWeek5A.gen_word()
+            while s in words:
+                s = GeneratorWeek5A.gen_word()
+            words.add(s)
+            ml = max(ml, len(s))
+        words = list(words)
+        k = random.randint(1, 50 if small else 10**5-1-ml)
+        ck = 0
+        t = ""
+        while ck < k:
+            w = random.choice(words)
+            t += w
+            ck += len(w)
+        return f"{n} {len(t)}\n{' '.join(words)}\n{t}\n"
+
+
+class GeneratorWeek5B(AbsGenerator):
+    @staticmethod
+    def generate() -> str:
+        small = random.random() < 0.6
+        n = random.randint(1, 10 if small else 1000)
+        k = random.randint(1, 50 if small else 10000)
+        w, c = [], []
+        for i in range(n):
+            w.append(random.randint(1, 10 if small else 100))
+            c.append(random.randint(1, 10 if small else 100))
+        return f"{n} {k}\n{' '.join(map(str, w))}\n{' '.join(map(str, c))}\n"
