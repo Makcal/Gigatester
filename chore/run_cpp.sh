@@ -9,6 +9,6 @@ set +e
 for i in `seq 0 $(($1-1))`
 do
    {
-     cat /data/input"$i".txt | ./"$3" &> /data/output"$i".txt
+     ./"$3" < /data/input"$i".txt &> /data/output"$i".txt
    } || true
 done
