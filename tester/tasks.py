@@ -31,8 +31,8 @@ class Task:
 week3A = Task(GeneratorWeek3A(), ('week3A.java', TESTER_DICT['java']), ComparisonChecker(), 100, 60)
 week3B = Task(GeneratorWeek3B(), ('week3B.java', TESTER_DICT['java']), ComparisonChecker(), 100, 60)
 week4A = Task(GeneratorWeek4A(), ('week4A.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 60, 60)
-week5A = Task(GeneratorWeek5A(), ('week5A.cpp', TESTER_DICT['cpp']), WordConcatenatorChecker(), 100, 60)
-week5B = Task(GeneratorWeek5B(), ('week5B.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 100, 60)
+week5A = Task(GeneratorWeek5A(), ('week5A.cpp', TESTER_DICT['cpp']), WordConcatenatorChecker(), 100, 120)
+week5B = Task(GeneratorWeek5B(), ('week5B.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 100, 100)
 TASK_DICT: dict[str, Task] = {
     'week3A': week3A,
     'week3B': week3B,
