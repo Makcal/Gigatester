@@ -1,7 +1,8 @@
 import random
 from abc import ABC, abstractmethod
 
-eng_alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+reduced_alpha = "abcdef"
+reduced_alnum = "abcde123"
 
 
 class AbsGenerator(ABC):
@@ -62,7 +63,7 @@ class GeneratorWeek4A(AbsGenerator):
         n = random.randint(1, 10)
         s = ""
         for i in range(n):
-            s += eng_alphabet[random.randint(0, len(eng_alphabet)-1)]
+            s += reduced_alpha[random.randint(0, len(reduced_alpha) - 1)]
         return s
 
     @staticmethod
@@ -88,7 +89,7 @@ class GeneratorWeek5A(AbsGenerator):
         len_ = random.randint(1, 16)
         s = ""
         for j in range(len_):
-            s += random.choice(eng_alphabet)
+            s += random.choice(reduced_alpha)
         return s
 
     @staticmethod
