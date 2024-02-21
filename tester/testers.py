@@ -117,8 +117,14 @@ class CppTester(AbsTester):
                     d.stop(timeout=5)
                     raise MyTimeoutError()
 
-            if d.logs():
-                raise MyContainerError(d.logs().decode())
+            logs = d.logs().decode().splitlines()
+            errors = ""
+            for line in logs:
+                if 'core dumped' in line or 'fault' in line or 'Aborted' in line:
+                    return [line] + ['' for _ in range(n_tests - 1)]
+                errors += line + '\n'
+            if logs:
+                raise MyContainerError(logs)
 
             output = []
             for i in range(n_tests):
