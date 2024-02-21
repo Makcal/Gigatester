@@ -77,13 +77,13 @@ class JavaTester(AbsTester):
         except docker.errors.ContainerError as e:
             error_message = e.stderr.decode()
             if error_message:
-                raise MyContainerError(error_message)
+                return [error_message] + ['' for _ in range(n_tests-1)]
             else:
                 try:
                     file = open(self.local('data', 'output0.txt'))
                     error_message = file.read()
                     file.close()
-                    raise MyContainerError(error_message)
+                    return [error_message] + ['' for _ in range(n_tests-1)]
                 except IOError:
                     raise MyContainerError("Unknown error.")
 
@@ -136,13 +136,13 @@ class CppTester(AbsTester):
         except docker.errors.ContainerError as e:
             error_message = e.stderr.decode()
             if error_message:
-                raise MyContainerError(error_message)
+                return [error_message] + ['' for _ in range(n_tests-1)]
             else:
                 try:
                     file = open(self.local('data', 'output0.txt'))
                     error_message = file.read()
                     file.close()
-                    raise MyContainerError(error_message)
+                    return [error_message] + ['' for _ in range(n_tests-1)]
                 except IOError:
                     raise MyContainerError("Unknown error.")
 
