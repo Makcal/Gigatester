@@ -22,7 +22,11 @@ TASKS = Literal[
     'DSA_week4A',
     'DSA_week5A',
     'DSA_week5B',
-    'AGLA2_task5'
+    'AGLA2_task1',
+    'AGLA2_task2',
+    'AGLA2_task3',
+    'AGLA2_task4',
+    'AGLA2_task5',
 ]
 TASK_NAMES = {
     'DSA_week3A': 'DSA week 3. Task A.',
@@ -30,6 +34,10 @@ TASK_NAMES = {
     'DSA_week4A': 'DSA week 4. Task A.',
     'DSA_week5A': 'DSA week 5. Task A.',
     'DSA_week5B': 'DSA week 5. Task B.',
+    'AGLA2_task1': 'AGLA II. Task 1.',
+    'AGLA2_task2': 'AGLA II. Task 2.',
+    'AGLA2_task3': 'AGLA II. Task 3.',
+    'AGLA2_task4': 'AGLA II. Task 4.',
     'AGLA2_task5': 'AGLA II. Task 5.',
 }
 
