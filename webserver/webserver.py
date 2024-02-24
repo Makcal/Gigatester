@@ -8,8 +8,8 @@ import uvicorn
 from fastapi import *
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 import pydantic
-
 
 LANGUAGES = Literal['java', 'cpp']
 LANGUAGE_NAMES = {
@@ -62,6 +62,14 @@ class Result(pydantic.BaseModel):
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 queue: list[str] = []
 results: dict[str, Result] = {}
 regs = defaultdict(int)
