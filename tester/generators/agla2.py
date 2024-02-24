@@ -65,10 +65,18 @@ class GeneratorAgla2Task5(AbsGenerator):
         return GeneratorAgla2Task4.generate()
 
 
+class GeneratorAgla2Task6(AbsGenerator):
+    @staticmethod
+    def generate() -> str:
+        n = random.randint(1, 4)
+        return f"{n}\n{gen_matrix(n, n)}{n}\n{gen_matrix(1, n)}"
+
+
 __all__ = [
     'GeneratorAgla2Task1',
     'GeneratorAgla2Task2',
     'GeneratorAgla2Task3',
     'GeneratorAgla2Task4',
     'GeneratorAgla2Task5',
+    'GeneratorAgla2Task6',
 ]

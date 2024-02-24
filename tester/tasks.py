@@ -4,7 +4,7 @@ import typing
 from checkers import AbsChecker, WordConcatenatorChecker
 from generators import GeneratorDsaWeek3A, GeneratorDsaWeek3B, GeneratorDsaWeek4A, GeneratorDsaWeek5A, \
     GeneratorDsaWeek5B, GeneratorAgla2Task1, GeneratorAgla2Task2, GeneratorAgla2Task3, GeneratorAgla2Task4, \
-    GeneratorAgla2Task5
+    GeneratorAgla2Task5, GeneratorAgla2Task6
 from testers import TESTER_DICT
 from checkers import ComparisonChecker
 
@@ -41,6 +41,7 @@ AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp'])
 AGLA_task3 = Task(GeneratorAgla2Task3(), ('AGLA2_task3.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 30, 30)
 AGLA_task4 = Task(GeneratorAgla2Task4(), ('AGLA2_task4.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 30, 30)
 AGLA_task5 = Task(GeneratorAgla2Task5(), ('AGLA2_task5.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 30, 30)
+AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 30, 30)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
@@ -53,6 +54,7 @@ TASK_DICT: dict[str, Task] = {
     'AGLA2_task3': AGLA_task3,
     'AGLA2_task4': AGLA_task4,
     'AGLA2_task5': AGLA_task5,
+    'AGLA2_task6': AGLA_task6,
 }
 
 __all__ = ['Task', 'TASK_DICT']
