@@ -11,6 +11,10 @@ class AbsChecker(ABC):
 class ComparisonChecker(AbsChecker):
     @staticmethod
     def check(expected: str, output: str, input_: str) -> bool:
+        expected = expected.strip()
+        output = output.strip()
+        expected = '\n'.join(s.strip() for s in expected.splitlines())
+        output = '\n'.join(s.strip() for s in output.splitlines())
         return expected == output
 
 
