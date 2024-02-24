@@ -1,18 +1,12 @@
 import random
-from abc import ABC, abstractmethod
+
+from .abs_generator import AbsGenerator
 
 reduced_alpha = "abcdef"
 reduced_alnum = "abcde123"
 
 
-class AbsGenerator(ABC):
-    @staticmethod
-    @abstractmethod
-    def generate() -> str:
-        pass
-
-
-class GeneratorWeek3A(AbsGenerator):
+class GeneratorDsaWeek3A(AbsGenerator):
     @staticmethod
     def generate() -> str:
         n, m = random.randint(1, 20), random.randint(1, 20)
@@ -33,7 +27,7 @@ class GeneratorWeek3A(AbsGenerator):
         return r
 
 
-class GeneratorWeek3B(AbsGenerator):
+class GeneratorDsaWeek3B(AbsGenerator):
     @staticmethod
     def generate() -> str:
         n, m = random.randint(1, 20), random.randint(1, 20)
@@ -57,7 +51,7 @@ class GeneratorWeek3B(AbsGenerator):
         return r
 
 
-class GeneratorWeek4A(AbsGenerator):
+class GeneratorDsaWeek4A(AbsGenerator):
     @staticmethod
     def gen_name():
         n = random.randint(1, 10)
@@ -79,11 +73,11 @@ class GeneratorWeek4A(AbsGenerator):
             while r in s:
                 r = random.randint(0, 10 ** 6)
             s.add(r)
-            test += f"{r} {GeneratorWeek4A.gen_name()} {GeneratorWeek4A.gen_name()}\n"
+            test += f"{r} {GeneratorDsaWeek4A.gen_name()} {GeneratorDsaWeek4A.gen_name()}\n"
         return test
 
 
-class GeneratorWeek5A(AbsGenerator):
+class GeneratorDsaWeek5A(AbsGenerator):
     @staticmethod
     def gen_word():
         len_ = random.randint(1, 16)
@@ -99,9 +93,9 @@ class GeneratorWeek5A(AbsGenerator):
         words = set()
         ml = -1
         for i in range(n):
-            s = GeneratorWeek5A.gen_word()
+            s = GeneratorDsaWeek5A.gen_word()
             while s in words:
-                s = GeneratorWeek5A.gen_word()
+                s = GeneratorDsaWeek5A.gen_word()
             words.add(s)
             ml = max(ml, len(s))
         words = list(words)
@@ -115,7 +109,7 @@ class GeneratorWeek5A(AbsGenerator):
         return f"{n} {len(t)}\n{' '.join(words)}\n{t}\n"
 
 
-class GeneratorWeek5B(AbsGenerator):
+class GeneratorDsaWeek5B(AbsGenerator):
     @staticmethod
     def generate() -> str:
         small = random.random() < 0.6
@@ -126,3 +120,12 @@ class GeneratorWeek5B(AbsGenerator):
             w.append(random.randint(1, 10 if small else 100))
             c.append(random.randint(1, 10 if small else 100))
         return f"{n} {k}\n{' '.join(map(str, w))}\n{' '.join(map(str, c))}\n"
+
+
+__all__ = [
+    "GeneratorDsaWeek3A",
+    "GeneratorDsaWeek3B",
+    "GeneratorDsaWeek4A",
+    "GeneratorDsaWeek5A",
+    "GeneratorDsaWeek5B",
+]

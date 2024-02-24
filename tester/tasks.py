@@ -2,7 +2,8 @@ import pathlib
 import typing
 
 from checkers import AbsChecker, WordConcatenatorChecker
-from generators import GeneratorWeek3A, GeneratorWeek3B, GeneratorWeek4A, GeneratorWeek5A, GeneratorWeek5B
+from generators import GeneratorDsaWeek3A, GeneratorDsaWeek3B, GeneratorDsaWeek4A, GeneratorDsaWeek5A, \
+    GeneratorDsaWeek5B, GeneratorAgla2Task5
 from testers import TESTER_DICT
 from checkers import ComparisonChecker
 
@@ -28,17 +29,18 @@ class Task:
         self.checker = checker
 
 
-week3A = Task(GeneratorWeek3A(), ('week3A.java', TESTER_DICT['java']), ComparisonChecker(), 100, 60)
-week3B = Task(GeneratorWeek3B(), ('week3B.java', TESTER_DICT['java']), ComparisonChecker(), 100, 60)
-week4A = Task(GeneratorWeek4A(), ('week4A.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 60, 60)
-week5A = Task(GeneratorWeek5A(), ('week5A.cpp', TESTER_DICT['cpp']), WordConcatenatorChecker(), 100, 120)
-week5B = Task(GeneratorWeek5B(), ('week5B.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 100, 100)
+DSA_week3A = Task(GeneratorDsaWeek3A(), ('DSA_week3A.java', TESTER_DICT['java']), ComparisonChecker(), 100, 60)
+DSA_week3B = Task(GeneratorDsaWeek3B(), ('DSA_week3B.java', TESTER_DICT['java']), ComparisonChecker(), 100, 60)
+DSA_week4A = Task(GeneratorDsaWeek4A(), ('DSA_week4A.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 60, 60)
+DSA_week5A = Task(GeneratorDsaWeek5A(), ('DSA_week5A.cpp', TESTER_DICT['cpp']), WordConcatenatorChecker(), 100, 120)
+DSA_week5B = Task(GeneratorDsaWeek5B(), ('DSA_week5B.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 100, 100)
+
 TASK_DICT: dict[str, Task] = {
-    'week3A': week3A,
-    'week3B': week3B,
-    'week4A': week4A,
-    'week5A': week5A,
-    'week5B': week5B,
+    'DSA_week3A': DSA_week3A,
+    'DSA_week3B': DSA_week3B,
+    'DSA_week4A': DSA_week4A,
+    'DSA_week5A': DSA_week5A,
+    'DSA_week5B': DSA_week5B,
 }
 
 __all__ = ['Task', 'TASK_DICT']
