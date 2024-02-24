@@ -12,14 +12,25 @@ import pydantic
 
 
 LANGUAGES = Literal['java', 'cpp']
-LANGUAGE_NAMES = {'java': 'Java 23', 'cpp': 'GCC C++ 17'}
-TASKS = Literal['DSA_week3A', 'DSA_week3B', 'DSA_week4A', 'DSA_week5A', 'DSA_week5B']
+LANGUAGE_NAMES = {
+    'java': 'Java 23',
+    'cpp': 'GCC C++ 17'
+}
+TASKS = Literal[
+    'DSA_week3A',
+    'DSA_week3B',
+    'DSA_week4A',
+    'DSA_week5A',
+    'DSA_week5B',
+    'AGLA2_task5'
+]
 TASK_NAMES = {
     'DSA_week3A': 'DSA week 3. Task A.',
     'DSA_week3B': 'DSA week 3. Task B.',
     'DSA_week4A': 'DSA week 4. Task A.',
     'DSA_week5A': 'DSA week 5. Task A.',
     'DSA_week5B': 'DSA week 5. Task B.',
+    'AGLA2_task5': 'AGLA II. Task 5.',
 }
 
 

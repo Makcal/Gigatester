@@ -104,7 +104,9 @@ def main():
                     if len(queue) != 0:
                         first = queue[0]
                         # timestamp, user id, task, language
-                        query_info = re.match('[0-9]+_([0-9a-f]{64})_([a-zA-Z0-9]+)_([a-z]+).txt', first).groups()
+                        tasks = '|'.join(t for t in TASK_DICT)
+                        langs = '|'.join(t for t in TESTER_DICT)
+                        query_info = re.match('[0-9]+_([0-9a-f]{64})_(%s)_(%s)\\.txt' % (tasks, langs), first).groups()
                         user_id = query_info[0]
                         task = TASK_DICT[query_info[1]]
                         tester = TESTER_DICT[query_info[2]]
