@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Hubballi&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hubballi&family=JetBrains+Mono&display=swap');
 
 html,
 body {
@@ -98,7 +98,7 @@ option {
 }
 
 .box .row.footer {
-    flex: 0 1 70px;
+    flex: 0 1 100px;
     position: relative;
 }
 
@@ -116,8 +116,19 @@ input[type=submit] {
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-    transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+    transition: background .2s ease, color .2s ease, box-shadow .2s ease, border-color .2s ease;
     z-index: 11;
+}
+
+input[type=submit]:disabled {
+    border-color: transparent;
+}
+
+input[type=submit]:disabled:hover {
+    background: transparent;
+    color: #aaa;
+    box-shadow: none;
+    cursor: not-allowed;
 }
 
 ::-webkit-scrollbar {
@@ -177,4 +188,322 @@ input[type=submit]:hover {
 a {
     color: inherit;
     text-decoration: none;
+    color: #c2e0f2;
+}
+
+#heart {
+    width: 1em;
+    height: 1em;
+    margin-left: .3em;
+}
+
+#broughtby {
+    display: flex;
+}
+
+tgs-player {
+    width: 61px;
+    height: 61px;
+    margin-left: 16px;
+}
+
+h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wait form,
+.res form,
+.res .cooking {
+    animation: slideleft .5s ease forwards;
+}
+
+@keyframes slideleft {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.blob {
+    fill: #e6e6e6;
+    width: 500px;
+    z-index: 2;
+    animation: swirl 30s infinite linear;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes swirl {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg) scaleY(80%);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotate(360deg) scaleY(130%);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(720deg) scaleY(80%);
+    }
+}
+
+.cooking {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.result {
+    display: none;
+}
+
+.wait .cooking,
+.res .result {
+    display: block;
+    opacity: 0;
+    animation: fadein .3s ease forwards;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.wait {
+    overflow: hidden;
+}
+
+.cooking img {
+    width: 250px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+.cooking .text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-125px);
+    text-align: center;
+    z-index: 4;
+    color: #222;
+    font-size: 23px;
+    text-align: center;
+    font-family: Hubballi;
+    font-weight: 100;
+    text-shadow: 0 0 10px #f2f2f2;
+    width: 200px;
+}
+
+.result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    text-align: center;
+    font-size: 23px;
+    font-family: Hubballi;
+    font-weight: 100;
+    color: #f2f2f2;
+    background: #222;
+    max-width: 80%;
+    padding: 20px 60px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    max-height: 80%;
+    overflow: auto;
+    box-shadow: 0 0 15px #33333333;
+    animation: fadein .3s ease forwards;
+}
+
+.result .data .line {
+    display: flex;
+}
+
+.result .data span {
+    flex: 1;
+    text-align: left;
+    margin: 10px;
+}
+
+.result .data textarea {
+    margin: 10px 0;
+    flex: 2;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #aaa;
+    background: transparent;
+    color: #f2f2f2;
+    font-family: 'JetBrains Mono';
+    font-size: 12px;
+    resize: none;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    height: 200px;
+}
+
+.wrong-answer {
+    color: #ce1619;
+}
+
+.compilation-error {
+    color: #801e94;
+}
+
+.time-limit-exceeded {
+    color: #0f98ba;
+}
+
+.arbuz {
+    color: #0fba26;
+}
+
+.no_tests {
+    text-align: center !important;
+    font-style: italic;
+    color: #aaa;
+}
+
+.lang {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    color: #f2f2f2;
+    padding: 5px;
+    border: 1px solid #aaa;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .2s ease, color .2s ease;
+}
+
+.lang:hover {
+    background: #f2f2f2;
+    border-color: #f2f2f2;
+    color: #222;
+}
+
+.lang.active {
+    background: #f2f2f2;
+    color: #222;
+    border-color: #f2f2f2;
+}
+
+.langs {
+    display: flex;
+}
+
+.select.language {
+    display: flex;
+    align-items: center;
+}
+
+#select_wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.result p {
+    margin-top: 0;
+}
+
+.falling-watermelon {
+    position: absolute;
+    pointer-events: none;
+    width: 50px;
+    height: 50px;
+    top: 0;
+    animation: falling infinite paused ease-in;
+    margin-top: -50px;
+}
+
+@keyframes falling {
+    0% {
+        margin-top: -50px;
+        transform: rotate(0);
+    }
+
+    100% {
+        margin-top: 100vh;
+        transform: rotate(600deg);
+    }
+}
+
+.watermelon-rain {
+    overflow: hidden;
+    background-image: url("watermelonbg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.result.presuccess {
+    width: 400px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+}
+
+.result.success {
+    animation: morph-watermelon 2s ease forwards, dance 1.3s infinite ease-in-out alternate-reverse;
+    transform-origin: 50% 80%;
+    flex-direction: column;
+    opacity: 1;
+    box-sizing: border-box;
+}
+
+@keyframes morph-watermelon {
+    from {
+        border-radius: 10px;
+        padding: 20px 60px;
+    }
+
+    to {
+        border-radius: 50%;
+        padding: 50px;
+        width: 50vmin;
+        height: 50vmin;
+        background: #158515;
+    }
+}
+
+@keyframes dance {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg) translateY(-30px) translateX(-30px);
+    }
+
+    20% {
+        transform: translate(-50%, -50%) rotate(5deg) translateY(9px) translateX(36px);
+    }
+
+    40% {
+        transform: translate(-50%, -50%) rotate(-5deg) translateY(-9px) translateX(-12px);
+    }
+
+    60% {
+        transform: translate(-50%, -50%) rotate(0deg) translateY(-30px) translateX(-30px);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(0deg) translateY(-30px) translateX(-30px);
+    }
 }

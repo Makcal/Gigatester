@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 import pydantic
+from starlette.responses import JSONResponse
 
 LANGUAGES = Literal['java', 'cpp']
 LANGUAGE_NAMES = {
@@ -131,7 +132,7 @@ async def form(background_tasks: BackgroundTasks,
     if program is None or program == "":
         raise HTTPException(400, "No input")
 
-    response = RedirectResponse("/static/wait.html", status.HTTP_302_FOUND)
+    response = JSONResponse({'user_id': user_id})
     response.set_cookie('task', task)
     response.set_cookie('language', language)
     if user_id not in queue:

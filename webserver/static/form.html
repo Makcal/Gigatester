@@ -1,57 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-      <title>Submit solution</title>
-      <link rel="stylesheet" type="text/css" href="form.css">
-   </head>
-   <body>
-      <div id="darkener"></div>
-      <form action="/submit" method="post" enctype="multipart/form-data">
-         <div class="box">
-            <div class="row header">
-               <h1>Welcome to Ultimate Tester</h1>
-               <div id="select_wrapper">
-                  <div class="select">
-                     <label for="tasks">Task: </label>
-                     <select id="tasks" name="task">
-                        <option value="AGLA2_task1">AGLA II. Task 1.</option>
-                        <option value="AGLA2_task2">AGLA II. Task 2.</option>
-                        <option value="AGLA2_task3">AGLA II. Task 3.</option>
-                        <option value="AGLA2_task4">AGLA II. Task 4.</option>
-                        <option value="AGLA2_task5">AGLA II. Task 5.</option>
-                        <option value="AGLA2_task6">AGLA II. Task 6.</option>
-                        <option value="DSA_week5A">DSA week 5. Task A.</option>
-                        <option value="DSA_week5B">DSA week 5. Task B.</option>
-                        <option value="DSA_week4A">DSA week 4. Task A.</option>
-                        <option value="DSA_week3A">DSA week 3. Task A.</option>
-                        <option value="DSA_week3B">DSA week 3. Task B.</option>
-                     </select>
-                  </div>
-                  <div class="select">
-                     <label for="languages">Language: </label>
-                     <select id="languages" name="language">
-                        <option value="java">Java 23</option>
-                        <option value="cpp">GCC C++ 17</option>
-                     </select>
-                  </div>
+
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Ultimate Tester</title>
+   <link rel="stylesheet" type="text/css" href="form.css">
+</head>
+
+<body>
+   <div id="darkener"></div>
+   <form action="/submit" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="language" id="languages">
+      <div class="box">
+         <div class="row header">
+            <h1>
+               <span>
+                  Welcome to the <br>ULTIMATE TESTER
+<!--                  <span style="color: #944242;">PRO</span>-->
+<!--                  <span style="color: #972690">MAX</span>-->
+<!--                  <span style="color: #799442">ARBUZ</span>-->
+<!--                  <span style="color: #2b9698">EDITION</span>-->
+               </span>
+               <tgs-player autoplay loop mode="normal" src="watermelon.tgs"></tgs-player>
+            </h1>
+            <div id="select_wrapper">
+               <div class="select">
+                  <label for="tasks">Task: </label>
+                  <select id="tasks" name="task">
+                     <option value="AGLA2_task1">AGLA II. Task 1.</option>
+                     <option value="AGLA2_task2">AGLA II. Task 2.</option>
+                     <option value="AGLA2_task3">AGLA II. Task 3.</option>
+                     <option value="AGLA2_task4">AGLA II. Task 4.</option>
+                     <option value="AGLA2_task5">AGLA II. Task 5.</option>
+                     <option value="DSA_week5A">DSA week 5. Task A.</option>
+                     <option value="DSA_week5B">DSA week 5. Task B.</option>
+                     <option value="DSA_week4A">DSA week 4. Task A.</option>
+                     <option value="DSA_week3A">DSA week 3. Task A.</option>
+                     <option value="DSA_week3B">DSA week 3. Task B.</option>
+                  </select>
                </div>
-            </div>
-            <div class="row content">
-               <div id="code_space"></div>
-            </div>
-            <textarea name="program" style="display: none;" id="program_contents"></textarea>
-            <div class="row footer">
-               <input type="submit" name="submit" value="Submit">
-               <div id="authors">
-                  <span style="font-weight: bold">Authors:</span><br>
-                  <a target="_blank" href="https://t.me/chelekushka">@chelekushka</a><br>
-                  Design: <a target="_blank" href="https://t.me/hikariatama">@hikariatama</a>
+               <div class="select language">
+                  <label>Language: </label>
+                  <div class="langs">
+                     <div id="lang-cpp" class="lang" data-lang="cpp">
+                        <img src="https://img.icons8.com/color/48/c-plus-plus-logo.png" alt="c++" width="20" />&nbsp;GCC
+                        C++ 17
+                     </div>
+                     <div id="lang-java" class="lang" data-lang="java">
+                        <img src="https://img.icons8.com/color/48/java-coffee-cup-logo--v1.png" alt="java"
+                           style="background: #f2f2f2; padding: 2px; box-sizing: border-box; border-radius: 50%;"
+                           width="20" />&nbsp;Java 23
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
-      </form>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ace.min.js"></script>
-      <script type="text/javascript" src="form.js"></script>
-   </body>
+         <div class="row content">
+            <div id="code_space" name="program"></div>
+         </div>
+         <textarea name="program" style="display: none;" id="program_contents"></textarea>
+         <div class="row footer"><input type="submit" name="submit" value="Submit" disabled>
+            <div id="authors">
+               <div id="broughtby">
+                  Brought to you with
+                  <img id="heart" src="https://img.icons8.com/color/256/filled-like.png" alt="filled-like" />
+               </div>
+               <a target="_blank" href="https://t.me/chelekushka">@chelekushka</a><br>
+               Design: <a target="_blank" href="https://t.me/hikariatama">@hikariatama</a>
+            </div>
+         </div>
+      </div>
+   </form>
+   <div class="cooking">
+      <p class="text">You are <span id="pos"></span> in the queue!</p>
+      <img src="https://i.pinimg.com/originals/6a/97/a1/6a97a14a0fa69fa1f3fcac7102b19462.gif" alt="dancing watermelons">
+      <svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 310 350" class="blob">
+         <path
+            d="M156.4,339.5c31.8-2.5,59.4-26.8,80.2-48.5c28.3-29.5,40.5-47,56.1-85.1c14-34.3,20.7-75.6,2.3-111  c-18.1-34.8-55.7-58-90.4-72.3c-11.7-4.8-24.1-8.8-36.8-11.5l-0.9-0.9l-0.6,0.6c-27.7-5.8-56.6-6-82.4,3c-38.8,13.6-64,48.8-66.8,90.3c-3,43.9,17.8,88.3,33.7,128.8c5.3,13.5,10.4,27.1,14.9,40.9C77.5,309.9,111,343,156.4,339.5z" />
+      </svg>
+   </div>
+   <div class="result">
+      <p class="text">Verdict: <span id="verdict"></span><br><span id="time"></span><br><span id="tests"></span></p>
+      <div class="data">
+
+      </div>
+   </div>
+   <div class="watermelons"></div>
+   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/tgs-player.js"></script>
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ace.min.js"></script>
+   <script type="text/javascript" src="form.js"></script>
+</body>
+
 </html>
