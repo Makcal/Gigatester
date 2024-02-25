@@ -171,7 +171,7 @@ window.addEventListener("load", () => {
                     } else {
                         let position = json['position'];
                         if (position === 1) {
-                            document.querySelector(".cooking .text").innerHTML = `<span style="color: #317721;">Watermelons</span> with us while we process your code...`;
+                            document.querySelector(".cooking .text").innerHTML = `<span style="color: #317721;">Watermelons</span> will stay with you while we process your code...`;
                             return;
                         }
                         let suffix;
