@@ -171,6 +171,7 @@ public:
                 }
                 if (maxi != j) {
                     temp = PermutationMatrix<NumT>(n, maxi, j) * temp;
+                    det *= -1;
                 }
             }
 

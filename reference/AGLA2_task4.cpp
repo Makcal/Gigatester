@@ -115,15 +115,13 @@ public:
     }
 
     friend ostream& operator<<(ostream &os, const Matrix<NumT> &matrix) {
-        os << matrix[0][0];
-        for (int j = 1; j < matrix.n; j++) {
-            os << ' ' << matrix[0][j];
+        for (int j = 0; j < matrix.n; j++) {
+            os << matrix[0][j] << ' ';
         }
         for (int i = 1; i < matrix.m; i++) {
             os << endl;
-            os << matrix[i][0];
-            for (int j = 1; j < matrix.n; j++) {
-                os << ' ' << matrix[i][j];
+            for (int j = 0; j < matrix.n; j++) {
+                os << matrix[i][j] << ' ';
             }
         }
         return os;
@@ -213,8 +211,9 @@ int main() {
                 }
             }
             if (maxi != j) {
-                cout << "step #" << step++ << ": permutation\n";
                 A = PermutationMatrix<double>(an, maxi, j) * A;
+                det *= -1;
+                cout << "step #" << step++ << ": permutation\n";
                 cout << A << '\n';
             }
         }
