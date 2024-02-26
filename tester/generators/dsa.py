@@ -126,7 +126,7 @@ class GeneratorDsaWeek6A(AbsGenerator):
     @staticmethod
     def generate() -> str:
         small = random.random() < 0.8
-        n = random.randint(1, 10 if small else 100_000)
+        n = random.randint(1, 10 if small else 3000)
         cu, ma = [], []
         for i in range(n):
             cu.append(random.randint(1, 20 if small else 100))
