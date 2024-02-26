@@ -1,5 +1,7 @@
 import random
 
+import numpy
+
 from .abs_generator import AbsGenerator
 
 
@@ -62,7 +64,19 @@ class GeneratorAgla2Task4(AbsGenerator):
 class GeneratorAgla2Task5(AbsGenerator):
     @staticmethod
     def generate() -> str:
-        return GeneratorAgla2Task4.generate()
+        notok = True
+        while notok:
+            res = GeneratorAgla2Task4.generate()
+            lines = res.splitlines()
+            n = int(lines[0])
+            m = numpy.matrix([numpy.fromstring(lines[1+i], sep=' ') for i in range(n)])
+            det = numpy.linalg.det(m)
+            if abs(det) < 1e-8:
+                notok = True
+            else:
+                notok = False
+        # noinspection PyUnboundLocalVariable
+        return res
 
 
 class GeneratorAgla2Task6(AbsGenerator):
