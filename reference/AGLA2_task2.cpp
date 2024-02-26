@@ -100,15 +100,15 @@ public:
     }
 
     friend ostream& operator<<(ostream &os, const Matrix<NumT> &matrix) {
-        os << matrix[0][0];
-        for (int j = 1; j < matrix.n; j++) {
-            os << ' ' << matrix[0][j];
+        for (int j = 0; j < matrix.n; j++) {
+            if (abs(matrix[0][j]) < 0.005) matrix.arr[0*matrix.n + j] = 0;
+            os << matrix[0][j] << ' ';
         }
         for (int i = 1; i < matrix.m; i++) {
             os << endl;
-            os << matrix[i][0];
-            for (int j = 1; j < matrix.n; j++) {
-                os << ' ' << matrix[i][j];
+            for (int j = 0; j < matrix.n; j++) {
+                if (abs(matrix[i][j]) < 0.005) matrix.arr[i*matrix.n + j] = 0;
+                os << matrix[i][j] << ' ';
             }
         }
         return os;

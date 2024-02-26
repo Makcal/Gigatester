@@ -116,11 +116,13 @@ public:
 
     friend ostream& operator<<(ostream &os, const Matrix<NumT> &matrix) {
         for (int j = 0; j < matrix.n; j++) {
+            if (abs(matrix[0][j]) < 0.005) matrix.arr[0*matrix.n + j] = 0;
             os << matrix[0][j] << ' ';
         }
         for (int i = 1; i < matrix.m; i++) {
             os << endl;
             for (int j = 0; j < matrix.n; j++) {
+                if (abs(matrix[i][j]) < 0.005) matrix.arr[i*matrix.n + j] = 0;
                 os << matrix[i][j] << ' ';
             }
         }
