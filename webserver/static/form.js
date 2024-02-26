@@ -113,7 +113,7 @@ window.addEventListener("load", () => {
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}`;
                             } else if (json.code === 1) {
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
-                                document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}`;
+                                document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}  Successful: ${json['tests'] - json['input'].length}  Failed: ${json['input'].length}`;
                                 document.querySelector(".data").innerHTML = "";
                                 for (let i = 0; i < json['output'].length; i++) {
                                     var input, output, expected;

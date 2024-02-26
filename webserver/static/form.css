@@ -456,6 +456,10 @@ h1 {
     background-attachment: fixed;
 }
 
+#tests {
+    white-space: break-spaces;
+}
+
 .result.presuccess {
     width: 400px;
     height: 200px;
