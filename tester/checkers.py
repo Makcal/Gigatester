@@ -22,3 +22,11 @@ class WordConcatenatorChecker(AbsChecker):
     @staticmethod
     def check(expected: str, output: str, input_: str) -> bool:
         return expected.replace(' ', '') == output.replace(' ', '')
+
+
+class AglaIgnoreNegativeZerosChecker(AbsChecker):
+    @staticmethod
+    def check(expected: str, output: str, input_: str) -> bool:
+        output = output.replace('-0.00', '0.00')
+        expected = expected.replace('-0.00', '0.00')
+        return ComparisonChecker.check(expected, output, input_)
