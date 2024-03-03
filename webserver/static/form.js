@@ -38,7 +38,7 @@ window.addEventListener("load", () => {
         document.querySelector("#program_contents").value = editor.getValue();
     })
 
-    if (getCookie('language') !== null) {
+    if (getCookie('language') !== null && getCookie('language') !== 'null') {
         document.querySelector(`.lang[data-lang=${getCookie('language')}]`).classList.add("active");
         document.querySelector("#languages").value = getCookie('language');
         document.cookie = `language=${getCookie('language')}`;
