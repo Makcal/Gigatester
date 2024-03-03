@@ -129,8 +129,8 @@ class GeneratorDsaWeek6A(AbsGenerator):
         n = random.randint(1, 15 if small else 3000)
         cu, ma = [], []
         for i in range(n):
-            cu.append(random.randint(1, 22 if small else 100))
-            ma.append(random.randint(1, 22 if small else 100_000))
+            cu.append(random.randint(0, 22 if small else 100))
+            ma.append(random.randint(0, 22 if small else 100_000))
         r = f"{n}\n"
         for i in range(n):
             r += f"{cu[i]} {ma[i]}\n"

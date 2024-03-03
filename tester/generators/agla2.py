@@ -82,6 +82,38 @@ class GeneratorAgla2Task5(AbsGenerator):
 class GeneratorAgla2Task6(AbsGenerator):
     @staticmethod
     def generate() -> str:
+        if random.random() < 0.1:
+            return """4
+1 -2 -1 1
+1 -8 -2 -3
+2 2 -1 7
+1 1 2 1
+4
+1 -2 7 1\n"""
+        if random.random() < 0.1:
+            return """4
+2 1 3 2
+2 1 5 1
+2 1 4 2
+1 3 3 2
+4
+0 2 1 6\n"""
+        if random.random() < 0.1:
+            return """4
+3 1 -2 -2
+2 -1 2 2
+2 -1 -1 -1
+1 1 -3 2
+4
+-2 2 -1 -3\n"""
+        if random.random() < 0.1:
+            return """4
+3 1 -2 -2
+3 1 -2 -2
+2 -1 -1 -1
+1 1 -3 2
+4
+-2 2 -1 -3\n"""
         n = random.randint(2, 4)
         return f"{n}\n{gen_matrix(n, n)}{n}\n{gen_matrix(1, n)}"
 

@@ -4,7 +4,7 @@
 cd /work
 cp "$2" "$3".cpp
 set -e
-g++ --std=c++17 -o $3 ./"$3".cpp &> /data/output0.txt
+g++ -O2 --std=c++17 -o $3 ./"$3".cpp &> /data/output0.txt
 set +e
 for i in `seq 0 $(($1-1))`
 do
