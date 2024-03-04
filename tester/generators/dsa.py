@@ -137,6 +137,16 @@ class GeneratorDsaWeek6A(AbsGenerator):
         return r
 
 
+class GeneratorDsaWeek7A(AbsGenerator):
+    @staticmethod
+    def generate() -> str:
+        small = random.random() < 0.8
+        n = random.randint(1, 12 if small else 1000)
+        nums = list(range(1, n+1))
+        random.shuffle(nums)
+        return f"{n}\n{' '.join(map(str, nums))}\n"
+
+
 __all__ = [
     "GeneratorDsaWeek3A",
     "GeneratorDsaWeek3B",
@@ -144,4 +154,5 @@ __all__ = [
     "GeneratorDsaWeek5A",
     "GeneratorDsaWeek5B",
     "GeneratorDsaWeek6A",
+    "GeneratorDsaWeek7A",
 ]

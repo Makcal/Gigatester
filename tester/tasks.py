@@ -1,10 +1,10 @@
 import pathlib
 import typing
 
-from checkers import AbsChecker, WordConcatenatorChecker, AglaIgnoreNegativeZerosChecker
+from checkers import AbsChecker, WordConcatenatorChecker, AglaIgnoreNegativeZerosChecker, BalancedTreeChecker
 from generators import GeneratorDsaWeek3A, GeneratorDsaWeek3B, GeneratorDsaWeek4A, GeneratorDsaWeek5A, \
     GeneratorDsaWeek5B, GeneratorAgla2Task1, GeneratorAgla2Task2, GeneratorAgla2Task3, GeneratorAgla2Task4, \
-    GeneratorAgla2Task5, GeneratorAgla2Task6, GeneratorDsaWeek6A
+    GeneratorAgla2Task5, GeneratorAgla2Task6, GeneratorDsaWeek6A, GeneratorDsaWeek7A
 from testers import TESTER_DICT
 from checkers import ComparisonChecker
 
@@ -36,6 +36,8 @@ DSA_week4A = Task(GeneratorDsaWeek4A(), ('DSA_week4A.cpp', TESTER_DICT['cpp']), 
 DSA_week5A = Task(GeneratorDsaWeek5A(), ('DSA_week5A.cpp', TESTER_DICT['cpp']), WordConcatenatorChecker(), 100, 120)
 DSA_week5B = Task(GeneratorDsaWeek5B(), ('DSA_week5B.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 100, 100)
 DSA_week6A = Task(GeneratorDsaWeek6A(), ('DSA_week6A.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 150, 60)
+DSA_week7A = Task(GeneratorDsaWeek7A(), ('DSA_week7A.cpp', TESTER_DICT['cpp']),
+                  BalancedTreeChecker(lambda a, b: max(a, b) - 2*min(a, b) <= 1), 150, 60)
 
 AGLA_task1 = Task(GeneratorAgla2Task1(), ('AGLA2_task1.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 50, 30)
 AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 50, 30)
@@ -51,6 +53,7 @@ TASK_DICT: dict[str, Task] = {
     'DSA_week5A': DSA_week5A,
     'DSA_week5B': DSA_week5B,
     'DSA_week6A': DSA_week6A,
+    'DSA_week7A': DSA_week7A,
     'AGLA2_task1': AGLA_task1,
     'AGLA2_task2': AGLA_task2,
     'AGLA2_task3': AGLA_task3,
