@@ -41,7 +41,12 @@ def compare(checker: AbsChecker, output: list[str], expected: list[str], n) -> t
         test_output = output[i]
         test_expected = expected[i]
 
-        if not checker.check(test_expected, test_output, test):
+        ok = False
+        try:
+            ok = checker.check(test_expected, test_output, test)
+        except Exception:
+            pass
+        if not ok:
             different = True
             different_inputs.append(test)
             different_outputs.append(test_output)
