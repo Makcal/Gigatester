@@ -19,6 +19,7 @@ echo \
 sudo apt-get update
 
 mkdir data queue reference webserver webserver/static
+cd tester
 python3.11 -m venv venv
 source venv/bin/activate
-pip install docker websockets
+pip install -r requirements.txt
