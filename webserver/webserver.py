@@ -123,6 +123,11 @@ async def reg(request: Request, call_next):
         response.set_cookie('user_id', user_id)
         return response
 
+
+@app.get("/")
+async def redirect():
+    return RedirectResponse("/static/form.html")
+
 """
 API
 """
