@@ -3,7 +3,7 @@ Wants=network.target
 After=network-online.target
 
 [Service]
-ExecStart=/root/gigatester/chore/startweb.sh
+ExecStart=/usr/gigatester/chore/startweb.sh
 Restart=always
 TimeoutStopSec=10
 

@@ -20,6 +20,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo docker pull makcal3000/gigatester-webserver
 
+sudo ln -s "$PWD" /usr/gigatester
 mkdir data queue reference webserver webserver/static
 cd tester
 python3.11 -m venv venv
