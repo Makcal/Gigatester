@@ -1,3 +1,4 @@
+from .log import init_web
 import os
 import random
 import time
@@ -74,6 +75,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+init_web(app)
 
 queue: list[str] = []
 results: dict[str, Result] = {}
@@ -194,6 +197,3 @@ async def internal(ws: WebSocket):
     except WebSocketDisconnect as e:
         print(e)
 
-
-if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=80)
