@@ -70,14 +70,15 @@ public:
                 next = current->right;
             }
         } while (next != nullptr);
-        bool childRight = (value >= current->value);
-        if (childRight) {
+        if (value >= current->value) {
             current->right = new Node(value, false, current);
         }
         else {
             current->left = new Node(value, false, current);
         }
-        if (current->isBlack) return;
+
+        fix_up:
+        if (current == nullptr || current->isBlack) return;
 
         Node* parent = current;
         Node* uncle;
@@ -93,22 +94,37 @@ public:
         if (uncle != nullptr && !uncle->isBlack) {
             uncle->isBlack = true;
             parent->isBlack = true;
-            parent->parent->isBlack = false;
-            return;
+            if (parent->parent != root) parent->parent->isBlack = false;
+
+            current = current->parent->parent;
+            goto fix_up;
         }
 
         // case 2
-        Node* child = (childRight ? parent->right : parent->left);
+        bool childRight = (value >= current->value);
+        Node *child = (childRight ? parent->right : parent->left);
         if (childRight == parentRight) {
             rotate(parent->parent, childRight);
             child->isBlack = true;
-            return;
+            if (child->parent == root) root->isBlack = true;
+            current = current->parent;
+            goto fix_up;
         }
 
         // case 3
-        rotate(parent, childRight);
-        rotate(child->parent, parentRight);
-        parent->isBlack = true;
+        if (childRight != parentRight) {
+            rotate(parent, childRight);
+            rotate(child->parent, parentRight);
+            parent->isBlack = true;
+            if (child == root) {
+                child->isBlack = true;
+                child->left->isBlack = false;
+                child->right->isBlack = false;
+            }
+
+            current = child->parent;
+            goto fix_up;
+        }
     }
 
     void iterate() {
@@ -132,6 +148,11 @@ public:
 };
 
 int main() {
+    // I/O speed up
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
     int n;
     cin >> n;
     cout << n << '\n';
