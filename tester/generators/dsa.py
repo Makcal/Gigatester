@@ -147,6 +147,18 @@ class GeneratorDsaWeek7A(AbsGenerator):
         return f"{n}\n{' '.join(map(str, nums))}\n"
 
 
+class GeneratorDsaWeek8A(AbsGenerator):
+    @staticmethod
+    def generate() -> str:
+        small = random.random() < 1
+        n = random.randint(1, 6 if small else 5000)
+        res = f"{n}\n"
+        for i in range(n):
+            line = ' '.join(str(random.randint(-7, 7) if small else random.randint(-2**15, 2**15)) for _ in range(4))
+            res += line + "\n"
+        return res
+
+
 __all__ = [
     "GeneratorDsaWeek3A",
     "GeneratorDsaWeek3B",
@@ -155,4 +167,5 @@ __all__ = [
     "GeneratorDsaWeek5B",
     "GeneratorDsaWeek6A",
     "GeneratorDsaWeek7A",
+    "GeneratorDsaWeek8A",
 ]
