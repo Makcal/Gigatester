@@ -150,7 +150,7 @@ class GeneratorDsaWeek7A(AbsGenerator):
 class GeneratorDsaWeek8A(AbsGenerator):
     @staticmethod
     def generate() -> str:
-        small = random.random() < 1
+        small = random.random() < 0.9
         n = random.randint(1, 6 if small else 5000)
         res = f"{n}\n"
         for i in range(n):

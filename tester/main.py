@@ -30,7 +30,7 @@ def generate(generator: AbsGenerator, n: int):
         fin.close()
 
 
-def compare(checker: AbsChecker, output: list[str], expected: list[str], n) -> tuple[bool, dict[str, any]]:
+def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int) -> tuple[bool, dict[str, any]]:
     different_inputs = []
     different_outputs = []
     different_expected = []
