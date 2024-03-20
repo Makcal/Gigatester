@@ -5,7 +5,8 @@ from checkers import AbsChecker, WordConcatenatorChecker, AglaIgnoreNegativeZero
     IntersectingSegmentsChecker
 from generators import GeneratorDsaWeek3A, GeneratorDsaWeek3B, GeneratorDsaWeek4A, GeneratorDsaWeek5A, \
     GeneratorDsaWeek5B, GeneratorAgla2Task1, GeneratorAgla2Task2, GeneratorAgla2Task3, GeneratorAgla2Task4, \
-    GeneratorAgla2Task5, GeneratorAgla2Task6, GeneratorDsaWeek6A, GeneratorDsaWeek7A, GeneratorDsaWeek8A
+    GeneratorAgla2Task5, GeneratorAgla2Task6, GeneratorDsaWeek6A, GeneratorDsaWeek7A, GeneratorDsaWeek8A, \
+    GeneratorAgla2Task7
 from testers import TESTER_DICT
 from checkers import ComparisonChecker
 
@@ -46,7 +47,8 @@ AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp'])
 AGLA_task3 = Task(GeneratorAgla2Task3(), ('AGLA2_task3.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 30, 30)
 AGLA_task4 = Task(GeneratorAgla2Task4(), ('AGLA2_task4.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 30, 30)
 AGLA_task5 = Task(GeneratorAgla2Task5(), ('AGLA2_task5.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 30, 30)
-AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 60, 40)
+AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 100, 40)
+AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 60, 40)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
@@ -63,6 +65,7 @@ TASK_DICT: dict[str, Task] = {
     'AGLA2_task4': AGLA_task4,
     'AGLA2_task5': AGLA_task5,
     'AGLA2_task6': AGLA_task6,
+    'AGLA2_task7': AGLA_task7,
 }
 
 __all__ = ['Task', 'TASK_DICT']
