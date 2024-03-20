@@ -51,7 +51,10 @@ class GeneratorAgla2Task3(AbsGenerator):
     @staticmethod
     def generate() -> str:
         n = random.randint(2, 4)
-        return f"{n}\n{gen_matrix(n, n)}"
+        while True:
+            m = gen_matrix(n, n)
+            if m[0] != '0':
+                return f"{n}\n{m}"
 
 
 class GeneratorAgla2Task4(AbsGenerator):
