@@ -9,7 +9,7 @@ template<typename NumT>
 class Matrix {
 protected:
     NumT *arr = nullptr;
-    size_t m, n;
+    size_t m = -1, n = -1;
 
     void init(NumT* init_arr) {
         memcpy(arr, init_arr, m * n * sizeof(NumT));
@@ -24,7 +24,7 @@ public:
         init(init_arr);
     }
 
-    Matrix(const Matrix<NumT>& other) : Matrix(m, n, other.arr) {}
+    Matrix(const Matrix<NumT>& other) : Matrix(other.m, other.n, other.arr) {}
 
     Matrix(Matrix<NumT>&& other) noexcept : m(other.m), n(other.n) {
         arr = other.arr;
@@ -115,15 +115,15 @@ public:
     }
 
     friend ostream& operator<<(ostream &os, const Matrix<NumT> &matrix) {
-        os << matrix[0][0];
-        for (int j = 1; j < matrix.n; j++) {
-            os << ' ' << matrix[0][j];
+        for (int j = 0; j < matrix.n; j++) {
+            if (abs(matrix[0][j]) < 0.005) matrix.arr[0*matrix.n + j] = 0;
+            os << matrix[0][j] << ' ';
         }
         for (int i = 1; i < matrix.m; i++) {
             os << endl;
-            os << matrix[i][0];
-            for (int j = 1; j < matrix.n; j++) {
-                os << ' ' << matrix[i][j];
+            for (int j = 0; j < matrix.n; j++) {
+                if (abs(matrix[i][j]) < 0.005) matrix.arr[i*matrix.n + j] = 0;
+                os << matrix[i][j] << ' ';
             }
         }
         return os;
@@ -151,6 +151,8 @@ public:
     SquareMatrix<NumT> operator*(const SquareMatrix<NumT>& other) {
         return SquareMatrix<NumT>((*this).Matrix<NumT>::operator*(other));
     }
+
+    double getDeterminant();
 };
 
 template<typename NumT>
@@ -194,6 +196,41 @@ public:
     }
 };
 
+template<typename NumT>
+double SquareMatrix<NumT>::getDeterminant() {
+    SquareMatrix<NumT> temp(*this);
+    size_t size = this->n;
+    double det = 1;
+    for (int j = 0; j < size; j++) {
+        {
+            int maxi = j;
+            for (int i = j+1; i < size; i++) {
+                if (abs(temp[i][j]) > abs(temp[maxi][j])) {
+                    maxi = i;
+                }
+            }
+            if (maxi != j) {
+                temp = PermutationMatrix<double>(size, maxi, j) * temp;
+                det *= -1;
+            }
+        }
+
+        det *= temp[j][j];
+
+        for (int i = j+1; i < size; i++) {
+            if (temp[i][j] == 0) {
+                continue;
+            }
+            temp = EliminationMatrix<double>(size, i, j, -temp[i][j] / temp[j][j]) * temp;
+        }
+    }
+
+    if (det == -0.0) {
+        det = 0.0;
+    }
+    return det;
+}
+
 int main() {
     int an;
     cin >> an;
@@ -208,6 +245,11 @@ int main() {
     }
     Matrix<double> AI(an, 2*an, input);
     delete[] input;
+
+    if (A.getDeterminant() == 0) {
+        cout << "Error: matrix A is singular" << endl;
+        return 0;
+    }
 
     cout << std::fixed << std::setprecision(2);
 
