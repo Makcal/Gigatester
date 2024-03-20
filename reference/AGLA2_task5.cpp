@@ -9,13 +9,14 @@ template<typename NumT>
 class Matrix {
 protected:
     NumT *arr = nullptr;
-    size_t m = -1, n = -1;
 
     void init(NumT* init_arr) {
         memcpy(arr, init_arr, m * n * sizeof(NumT));
     }
 
 public:
+    size_t m, n;
+
     Matrix(size_t m, size_t n) : m(m), n(n) {
         arr = new NumT[m * n * sizeof(NumT)];
     }
@@ -40,16 +41,16 @@ public:
     }
 
     Matrix<NumT> transpose() const {
-        Matrix<NumT> t(n+0, m);
+        Matrix<NumT> t(n, m);
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                t[j][i] = this->arr[i*n+j];
+                t.arr[j*m + i] = this->arr[i*n + j];
             }
         }
-        return t;
+        return std::move(t);
     }
 
-    virtual inline const NumT* operator[](int i) const {
+    virtual inline const NumT* operator[](size_t i) const {
         return arr + n*i;
     }
 
@@ -81,7 +82,7 @@ public:
                 c.arr[i*n+j] = this->arr[i*n+j] + other.arr[i*n+j];
             }
         }
-        return c;
+        return std::move(c);
     }
 
     Matrix<NumT> operator-(const Matrix<NumT>& other) {
@@ -94,7 +95,7 @@ public:
                 c.arr[i*n+j] = this->arr[i*n+j] - other.arr[i*n+j];
             }
         }
-        return c;
+        return std::move(c);
     }
 
     Matrix<NumT> operator*(const Matrix<NumT>& other) {
@@ -111,18 +112,18 @@ public:
                 c.arr[i*c.n+j] = sum;
             }
         }
-        return c;
+        return std::move(c);
     }
 
     friend ostream& operator<<(ostream &os, const Matrix<NumT> &matrix) {
         for (int j = 0; j < matrix.n; j++) {
-            if (abs(matrix[0][j]) < 0.005) matrix.arr[0*matrix.n + j] = 0;
+//            if (abs(matrix[0][j]) < 0.005) matrix.arr[0*matrix.n + j] = 0;
             os << matrix[0][j] << ' ';
         }
         for (int i = 1; i < matrix.m; i++) {
             os << endl;
             for (int j = 0; j < matrix.n; j++) {
-                if (abs(matrix[i][j]) < 0.005) matrix.arr[i*matrix.n + j] = 0;
+//                if (abs(matrix[i][j]) < 0.005) matrix.arr[i*matrix.n + j] = 0;
                 os << matrix[i][j] << ' ';
             }
         }
