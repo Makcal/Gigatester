@@ -25,8 +25,8 @@ class WordConcatenatorChecker(AbsChecker):
 
 class AglaIgnoreNegativeZerosChecker(AbsChecker):
     def check(self, expected: str, output: str, input_: str) -> bool:
-        output = re.sub(r'-(0\.0+)(?=\s)', lambda m: m.group(1), output)
-        expected = re.sub(r'-(0\.0+)(?=\s)', lambda m: m.group(1), expected)
+        output = re.sub(r'-(0\.0+)(?=\s|$)', lambda m: m.group(1), output)
+        expected = re.sub(r'-(0\.0+)(?=\s|$)', lambda m: m.group(1), expected)
         return ComparisonChecker().check(expected, output, input_)
 
 
