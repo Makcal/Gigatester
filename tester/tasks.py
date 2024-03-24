@@ -42,13 +42,13 @@ DSA_week7A = Task(GeneratorDsaWeek7A(), ('DSA_week7A.cpp', TESTER_DICT['cpp']),
                   BalancedTreeChecker(lambda a, b: max(a, b) - 2*min(a, b) <= 1), 150, 60)
 DSA_week8A = Task(GeneratorDsaWeek8A(), ('DSA_week8A.cpp', TESTER_DICT['cpp']), IntersectingSegmentsChecker(), 150, 70)
 
-AGLA_task1 = Task(GeneratorAgla2Task1(), ('AGLA2_task1.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 50, 30)
-AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 50, 30)
-AGLA_task3 = Task(GeneratorAgla2Task3(), ('AGLA2_task3.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 30, 30)
-AGLA_task4 = Task(GeneratorAgla2Task4(), ('AGLA2_task4.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 30, 30)
-AGLA_task5 = Task(GeneratorAgla2Task5(), ('AGLA2_task5.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 30, 30)
-AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 100, 40)
-AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 60, 40)
+AGLA_task1 = Task(GeneratorAgla2Task1(), ('AGLA2_task1.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 70, 30)
+AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 70, 30)
+AGLA_task3 = Task(GeneratorAgla2Task3(), ('AGLA2_task3.cpp', TESTER_DICT['cpp']), ComparisonChecker(), 70, 40)
+AGLA_task4 = Task(GeneratorAgla2Task4(), ('AGLA2_task4.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 100, 50)
+AGLA_task5 = Task(GeneratorAgla2Task5(), ('AGLA2_task5.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 100, 50)
+AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 100, 50)
+AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp']), AglaIgnoreNegativeZerosChecker(), 100, 50)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
