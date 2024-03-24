@@ -60,16 +60,10 @@ class GeneratorAgla2Task3(AbsGenerator):
 class GeneratorAgla2Task4(AbsGenerator):
     @staticmethod
     def generate() -> str:
-        n = random.randint(2, 4)
-        return f"{n}\n{gen_matrix(n, n, bool(random.randint(0, 1)))}"
-
-
-class GeneratorAgla2Task5(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
         singular = random.random() < 0.1
         while True:
-            res = GeneratorAgla2Task4.generate()
+            n = random.randint(2, 4)
+            res = f"{n}\n{gen_matrix(n, n, bool(random.randint(0, 1)))}"
             lines = res.splitlines()
             n = int(lines[0])
             m = numpy.matrix([numpy.fromstring(lines[1+i], sep=' ') for i in range(n)])
@@ -82,6 +76,12 @@ class GeneratorAgla2Task5(AbsGenerator):
                     break
         # noinspection PyUnboundLocalVariable
         return res
+
+
+class GeneratorAgla2Task5(AbsGenerator):
+    @staticmethod
+    def generate() -> str:
+        return GeneratorAgla2Task4.generate()
 
 
 class GeneratorAgla2Task6(AbsGenerator):
@@ -128,7 +128,19 @@ class GeneratorAgla2Task7(AbsGenerator):
     def generate() -> str:
         m = random.randint(2, 7)
         n = random.randint(1, m-1) if random.random() < 0.5 else 1
-        return f"{m}\n{gen_matrix(m, 2)}{n}\n"
+        while True:
+            res = f"{m}\n{gen_matrix(m, 2)}{n}\n"
+            lines = [[int(n) for n in line.split()] for line in res.splitlines()]
+            m = int(lines[0][0])
+            n = int(lines[-1][0])
+            matrix = []
+            for i in range(m):
+                matrix.append([1])
+                for j in range(n):
+                    matrix[i].append(matrix[i][-1] * lines[1+i][0])
+            if abs(numpy.linalg.det(numpy.matrix(matrix).transpose() * numpy.matrix(matrix))) > 0.00005:
+                break
+        return res
 
 
 __all__ = [
