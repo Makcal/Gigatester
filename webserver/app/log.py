@@ -1,6 +1,6 @@
 # TrainYourBrain © 2024 by Daniil Gazizullin is licensed under CC BY-ND 4.0.
 # To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/4.0/
-
+import json
 import logging
 import os
 import sys
@@ -10,9 +10,10 @@ import structlog
 from fastapi import FastAPI
 from pydantic import parse_obj_as
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import Response, StreamingResponse
 from structlog.types import EventDict, Processor
 from uvicorn.protocols.utils import get_path_with_query_string
+
 
 # Taken from https://gist.github.com/nymous/f138c7f06062b7c43c060bf03759c29e
 
@@ -148,8 +149,28 @@ def init_web(app: FastAPI):
         # If the call_next raises an error, we still want to return our own
         # 500 response, so we can add headers to it (process time, request ID...)
         response = Response(status_code=500)
+        statistics = {'success_result': False}
         try:
             response = await call_next(request)
+            # collect statistics
+            try:
+                if request.url.path == "/result" and response.status_code == 200:
+                    # copy body
+                    response_body = b""
+                    async for chunk in response.body_iterator:
+                        response_body += chunk
+                    response = Response(content=response_body, status_code=response.status_code,
+                                        headers=dict(response.headers), media_type=response.media_type,
+                                        background=response.background)
+
+                    statistics['success_result'] = True
+                    result: dict = json.loads(response_body)
+                    result.pop("input", None)
+                    result.pop("output", None)
+                    result.pop("expected", None)
+                    statistics['result'] = result
+            except Exception:
+                raise
         except Exception:
             await structlog.stdlib.get_logger("api.error").exception(
                 "Uncaught exception"
@@ -186,6 +207,7 @@ def init_web(app: FastAPI):
                         "request_id": request_id,
                         "version": http_version,
                     },
+                    statistics=statistics,
                     duration=process_time,
                 )
             response.headers["X-Process-Time"] = str(process_time / 10**9)

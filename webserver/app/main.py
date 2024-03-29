@@ -4,7 +4,6 @@ import time
 from collections import defaultdict
 from typing import Annotated, Literal
 
-import pydantic
 import uvicorn
 from fastapi import *
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +11,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse
 
+from .structures import Update, Result
 from .log import init_web
 
 LANGUAGES = Literal['java', 'cpp']
@@ -53,24 +53,6 @@ TASK_NAMES = {
     'AGLA2_task6': 'AGLA II. Task 6.',
     'AGLA2_task7': 'AGLA II. Task 7.',
 }
-
-
-class Update(pydantic.BaseModel):
-    code: int
-    position: int | None = None
-
-
-class Result(pydantic.BaseModel):
-    code: int
-    error: str | None = None
-    time: float | None = None
-    tests: int | None = None
-    input: list[str] | None = None
-    expected: list[str] | None = None
-    output: list[str] | None = None
-    language: str | None = None
-    task: str | None = None
-
 
 app = FastAPI()
 app.add_middleware(
@@ -204,4 +186,4 @@ async def internal(ws: WebSocket):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
