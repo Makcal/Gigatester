@@ -14,6 +14,17 @@ function getCookie(cname) {
     return null;
 }
 
+function getEditorMode(language) {
+    switch (language) {
+        case "java":
+            return "ace/mode/java";
+        case "cpp17":
+        case "cpp20":
+            return "ace/mode/c_cpp";
+    }
+    return "ace/mode/c_cpp";
+}
+
 window.addEventListener("load", () => {
 
     var editor = ace.edit("code_space");
@@ -38,16 +49,17 @@ window.addEventListener("load", () => {
         document.querySelector("#program_contents").value = editor.getValue();
     })
 
-    if (getCookie('language') !== null && getCookie('language') !== 'null') {
+    if (getCookie('language') !== null && ['cpp17', 'cpp20', 'java'].includes(getCookie('language'))) {
         document.querySelector(`.lang[data-lang=${getCookie('language')}]`).classList.add("active");
         document.querySelector("#languages").value = getCookie('language');
         document.cookie = `language=${getCookie('language')}`;
     } else {
         document.querySelector(".lang").classList.add("active");
-        document.querySelector("#languages").value = "cpp";
+        document.querySelector("#languages").value = "cpp17";
     }
 
-    editor.session.setMode(getCookie('language') === "cpp" ? "ace/mode/c_cpp" : "ace/mode/java");
+
+    editor.session.setMode(getEditorMode(getCookie('language')));
     if (getCookie('task') !== null)
         document.querySelector("#tasks").value = getCookie('task');
     document.querySelector("input[type=submit]").disabled = false;
@@ -199,7 +211,7 @@ window.addEventListener("load", () => {
             lang.classList.add("active");
             document.querySelector("#languages").value = e.target.getAttribute("data-lang");
             document.cookie = `language=${e.target.getAttribute("data-lang")}`;
-            editor.session.setMode(e.target.getAttribute("data-lang").value === "cpp" ? "ace/mode/c_cpp" : "ace/mode/java");
+            editor.session.setMode(getEditorMode(e.target.getAttribute("data-lang").value));
         });
     });
 });

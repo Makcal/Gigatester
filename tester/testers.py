@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import os
 from os import PathLike
 from pathlib import Path
+from typing import Literal
 
 import docker
 import docker.errors
@@ -97,6 +98,12 @@ class JavaTester(AbsTester):
 
 
 class CppTester(AbsTester):
+    version: str
+
+    def __init__(self, work_dir: Path, docker_engine: docker.DockerClient, /, *, version: str):
+        super().__init__(work_dir, docker_engine)
+        self.version = version
+
     def _test(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
         shutil.copyfile(self.local('chore', 'run_cpp.sh'), self.local('data', 'run_cpp.sh'))
         shutil.copyfile(file_name, self.local('prog', 'main.cpp'))
@@ -107,7 +114,7 @@ class CppTester(AbsTester):
                 detach=True, network_mode='none', working_dir='/work', stderr=True,
                 volumes=[f'{self.local("prog")}:/prog:ro',
                          f'{self.local("data")}:/data'],
-                command=f'/bin/bash /data/run_cpp.sh {n_tests} /prog/main.cpp main'
+                command=f'/bin/bash /data/run_cpp.sh {n_tests} {self.version} /prog/main.cpp main'
             )
             t1 = time.time()
             while d.status != 'exited':
@@ -167,10 +174,12 @@ else:
     _docker_engine = docker.DockerClient()
 
 java_tester = JavaTester(pathlib.Path().absolute(), _docker_engine)
-cpp_tester = CppTester(pathlib.Path().absolute(), _docker_engine)
-TESTER_DICT: dict[str, AbsTester] = {
+cpp17_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='17')
+cpp20_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='20')
+TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20'], AbsTester] = {
     'java': java_tester,
-    'cpp': cpp_tester,
+    'cpp17': cpp17_tester,
+    'cpp20': cpp20_tester,
 }
 
 __all__ = ['AbsTester', 'TESTER_DICT']
