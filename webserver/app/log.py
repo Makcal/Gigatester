@@ -169,6 +169,7 @@ def init_web(app: FastAPI):
                     result.pop("output", None)
                     result.pop("expected", None)
                     statistics['result'] = result
+                    statistics['user_id'] = request.cookies.get('user_id')
             except Exception as e:
                 response = Response(status_code=500)
                 access_logger.error(f"LOGGER ERROR: {type(e)}: {e}")
