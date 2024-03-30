@@ -169,8 +169,9 @@ def init_web(app: FastAPI):
                     result.pop("output", None)
                     result.pop("expected", None)
                     statistics['result'] = result
-            except Exception:
-                raise
+            except Exception as e:
+                response = Response(status_code=500)
+                access_logger.error(f"LOGGER ERROR: {type(e)}: {e}")
         except Exception:
             await structlog.stdlib.get_logger("api.error").exception(
                 "Uncaught exception"
