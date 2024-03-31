@@ -311,7 +311,7 @@ int main() {
 
     cout << "Result:\n";
     for (int i = 0; i < an; i++) {
-        cout << AI[i][an] << ' ';
+        cout << AI[i][an] << '\n';
     }
     cout << endl;
 }
