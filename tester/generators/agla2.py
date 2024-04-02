@@ -18,8 +18,7 @@ def gen_matrix(m, n, float_=False, range_=(-5, 5)) -> str:
 
 
 class GeneratorAgla2Task1(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         if random.randint(0, 1):
             m2 = m1 = random.randint(2, 4)
             n2 = n1 = random.randint(2, 4)
@@ -35,8 +34,7 @@ class GeneratorAgla2Task1(AbsGenerator):
 
 
 class GeneratorAgla2Task2(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         if random.randint(0, 1):
             n2 = n1 = random.randint(2, 4)
         else:
@@ -48,8 +46,7 @@ class GeneratorAgla2Task2(AbsGenerator):
 
 
 class GeneratorAgla2Task3(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         n = random.randint(2, 4)
         while True:
             m = gen_matrix(n, n)
@@ -58,8 +55,7 @@ class GeneratorAgla2Task3(AbsGenerator):
 
 
 class GeneratorAgla2Task4(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         singular = random.random() < 0.1
         while True:
             n = random.randint(2, 4)
@@ -79,14 +75,12 @@ class GeneratorAgla2Task4(AbsGenerator):
 
 
 class GeneratorAgla2Task5(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
-        return GeneratorAgla2Task4.generate()
+    def generate(self) -> str:
+        return GeneratorAgla2Task4().generate()
 
 
 class GeneratorAgla2Task6(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         if random.random() < 0.1:
             return """4
 1 -2 -1 1
@@ -124,8 +118,7 @@ class GeneratorAgla2Task6(AbsGenerator):
 
 
 class GeneratorAgla2Task7(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         m = random.randint(2, 7)
         n = random.randint(1, m-1) if random.random() < 0.5 else 1
         while True:

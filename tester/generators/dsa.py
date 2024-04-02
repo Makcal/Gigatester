@@ -7,8 +7,7 @@ reduced_alnum = "abcde123"
 
 
 class GeneratorDsaWeek3A(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         n, m = random.randint(1, 20), random.randint(1, 20)
         s = set()
         alph = 'abcdefgxy'
@@ -28,8 +27,7 @@ class GeneratorDsaWeek3A(AbsGenerator):
 
 
 class GeneratorDsaWeek3B(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         n, m = random.randint(1, 20), random.randint(1, 20)
         bb = 0
         s = set()
@@ -60,8 +58,7 @@ class GeneratorDsaWeek4A(AbsGenerator):
             s += reduced_alpha[random.randint(0, len(reduced_alpha) - 1)]
         return s
 
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         if random.random() < 0.9:
             n = random.randint(0, 50//2-1) * 2 + 1
         else:
@@ -86,8 +83,7 @@ class GeneratorDsaWeek5A(AbsGenerator):
             s += random.choice(reduced_alpha)
         return s
 
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         small = random.random() < 0.6
         n = random.randint(1, 10 if small else 1000)
         words = set()
@@ -110,8 +106,7 @@ class GeneratorDsaWeek5A(AbsGenerator):
 
 
 class GeneratorDsaWeek5B(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         small = random.random() < 0.6
         n = random.randint(1, 10 if small else 1000)
         k = random.randint(1, 50 if small else 10000)
@@ -123,8 +118,7 @@ class GeneratorDsaWeek5B(AbsGenerator):
 
 
 class GeneratorDsaWeek6A(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         small = random.random() < 1
         n = random.randint(1, 15 if small else 3000)
         cu, ma = [], []
@@ -138,8 +132,7 @@ class GeneratorDsaWeek6A(AbsGenerator):
 
 
 class GeneratorDsaWeek7A(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         small = random.random() < 0.8
         n = random.randint(1, 12 if small else 1000)
         nums = list(range(1, n+1))
@@ -148,8 +141,7 @@ class GeneratorDsaWeek7A(AbsGenerator):
 
 
 class GeneratorDsaWeek8A(AbsGenerator):
-    @staticmethod
-    def generate() -> str:
+    def generate(self) -> str:
         small = random.random() < 0.9
         n = random.randint(1, 6 if small else 5000)
         res = f"{n}\n"

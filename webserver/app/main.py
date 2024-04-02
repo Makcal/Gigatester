@@ -36,6 +36,7 @@ TASKS = Literal[
     'AGLA2_task5',
     'AGLA2_task6',
     'AGLA2_task7',
+    'SSAD_task2',
 ]
 TASK_NAMES = {
     'DSA_week3A': 'DSA week 3. Task A.',
@@ -53,6 +54,7 @@ TASK_NAMES = {
     'AGLA2_task5': 'AGLA II. Task 5.',
     'AGLA2_task6': 'AGLA II. Task 6.',
     'AGLA2_task7': 'AGLA II. Task 7.',
+    'SSAD_task2': 'SSAD. Assignment 2..',
 }
 
 app = FastAPI()
