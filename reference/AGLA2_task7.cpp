@@ -329,7 +329,7 @@ int main() {
     SquareMatrix<double> ATA(A.transpose() * A);
     cout << "A_T*A:\n" << ATA << "\n";
     ATA = ATA.inverse();
-    cout << "(A_T*A)_-1:\n" << ATA << "\n";
+    cout << "(A_T*A)^-1:\n" << ATA << "\n";
     Matrix<double> ATB(A.transpose() * b);
     cout << "A_T*b:\n" << ATB << "\n";
     Matrix<double> ans((Matrix<double>)ATA * ATB);
