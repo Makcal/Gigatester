@@ -18,6 +18,9 @@ from testers import AbsTester, TESTER_DICT
 def generate(generator: AbsGenerator, n: int):
     try:
         shutil.rmtree(pathlib.Path().absolute().joinpath('data'))
+    except FileNotFoundError:
+        pass
+    try:
         shutil.rmtree(pathlib.Path().absolute().joinpath('prog'))
     except FileNotFoundError:
         pass
