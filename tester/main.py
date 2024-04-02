@@ -73,8 +73,13 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
     try:
         try:
             generate(task.generator, 1)
-            first_expected = task.default_tester.start(1, task.reference_file, 10)
-            first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 10)
+            try:
+                first_expected = task.default_tester.start(1, task.reference_file, 10)
+                first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 10)
+            except MyTimeoutError:
+                with open(f'data/input0.txt') as fin:
+                    test = fin.read()
+                return {'code': 2, 'tests': 1, 'input': [test]}
             first_res = compare(task.checker, first_output, first_expected, 1)
             if not first_res[0]:
                 return first_res[1]

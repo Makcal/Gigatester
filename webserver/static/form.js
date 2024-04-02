@@ -123,12 +123,28 @@ window.addEventListener("load", () => {
                             if (json.code === 2) {
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}`;
+                                if (json['tests'] === 1) {
+                                    let input;
+                                    input = json['input'][0];
+
+                                    input = input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                                    document.querySelector(".data").innerHTML = "";
+                                    document.querySelector(".data").insertAdjacentHTML("beforeend", `
+                                <span class="line">
+                                    <span class="text_block">
+                                        Input:
+                                        <br>
+                                        <textarea class="input code">${input}</textarea>
+                                    </span>
+                                </span>`);
+                                }
                             } else if (json.code === 1) {
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}  Successful: ${json['tests'] - json['input'].length}  Failed: ${json['input'].length}`;
                                 document.querySelector(".data").innerHTML = "";
                                 for (let i = 0; i < json['output'].length; i++) {
-                                    var input, output, expected;
+                                    let input, output, expected;
                                     input = json['input'][i];
                                     output = json['output'][i];
                                     expected = json['expected'][i];
