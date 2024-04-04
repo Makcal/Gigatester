@@ -75,7 +75,7 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
             generate(task.generator, 1)
             try:
                 first_expected = task.default_tester.start(1, task.reference_file, 10)
-                first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 20)
+                first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 30)
             except MyTimeoutError:
                 with open(f'data/input0.txt') as fin:
                     test = fin.read()
