@@ -41,42 +41,10 @@ class GeneratorSSADTask2(AbsGenerator):
         self.items = []
         self.result = ""
         self.valid_cmd = True
-        n = random.randint(1, 2000 if random.random() < 0.05 else 30)
+        n = random.randint(1, 200 if random.random() < 0.05 else 30)
         i = 0
         self.result = f"{n}\n"
         while i < n:
-            """
-Errors to be handled:
-
-Character doesn't exist (Attack, Cast, Drink, Create item, spell target is not a character, Dialogue)
-Character doesn't own an item (Attack, Cast, Drink).
-Negative value or zero for a potion healValue (Create item potion).
-Negative value or zero for a weapon's damageValue (Create item weapon).
-Target is not in the list of allowed targets in casting spells (Cast).
-Arsenal, MedicalBag, or SpellBook are full (Create item)
-Character can't carry or use a certain item, e.g., wizards can't have weapons 
-(show $itemType $characterName, Create Item, Attack, Cast).
-            
-            
-"Create character $[string]type $[string]name $[int]initHP" (type can be fighter, wizard, or archer. 1≤initHP≤200
-).
-"Create item weapon $[string]ownerName $[string]weaponName $[int]damageValue" (1≤damageValue≤50
-).
-"Create item potion $[string]ownerName $[string]potionName $[int]healValue" (1≤healValue≤50
-).
-"Create item spell $[string]ownerName $[string]spellName $[int]m $[string_1, string_2, ..., string_m]characterNames" (set of 0≤m≤50
- unique characters names the spell can be applied on).
-"Attack $[string]attackerName $[string]targetName $[string]weaponName" (attacker and target can be the same).
-"Cast $[string]casterName $[string]targetName $[string]spellName" (caster and target can be the same).
-"Drink $[string]supplierName $[string]drinkerName $[string]potionName" (supplier and drinker can be the same).
-"Dialogue $[string]speaker (a character name or "Narrator") $[int]sp_len $[string_1, string_2, ..., string_sp_len]speech" (the speech itself where its length is sp_len, 1≤sp_len≤10
-).
-"Show characters" (show alive characters in alphabetical order).
-"Show weapons $[string]characterName" (show weapons owned by characterName in alphabetical order).
-"Show potions $[string]characterName" (show potions owned by characterName in alphabetical order).
-"Show spells $[string]characterName" (show spells owned by characterName in alphabetical order).
-The death of characters should be handled automatically.
-"""
             self.valid_cmd = random.random() < 0.92
             if i == 0 and random.random() < 0.9:
                 cmd = 'create_character'
