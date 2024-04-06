@@ -99,6 +99,7 @@ class JavaTester(AbsTester):
 
 class CppTester(AbsTester):
     version: str
+    test_separator_pattern = "<<<ARBUZ{}ARBUZ>>>"
 
     def __init__(self, work_dir: Path, docker_engine: docker.DockerClient, /, *, version: str):
         super().__init__(work_dir, docker_engine)
@@ -124,20 +125,30 @@ class CppTester(AbsTester):
                     d.stop(timeout=5)
                     raise MyTimeoutError()
 
-            logs = d.logs().decode().splitlines()
-            errors = ""
-            for line in logs:
-                if 'core dumped' in line or 'fault' in line or 'Aborted' in line:
-                    return [line] + ['' for _ in range(n_tests - 1)]
-                errors += line + '\n'
-            if logs:
-                raise MyContainerError(logs)
-
             output = []
             for i in range(n_tests):
-                file = open(self.local('data', f'output{i}.txt'))
-                output.append(file.read().strip())
-                file.close()
+                try:
+                    with open(self.local('data', f'output{i}.txt')) as file:
+                        output.append(file.read().strip())
+                except FileNotFoundError:
+                    output.append("")
+
+            logs: str = d.logs().decode()
+            p = 0
+            for i in range(n_tests):
+                separator = CppTester.test_separator_pattern.format(i)
+                p = logs.find(separator, p)
+                if p == -1:
+                    p = len(logs)
+                else:
+                    p += len(separator)
+                p_next = logs.find(CppTester.test_separator_pattern.format(i+1), p)
+                if p_next == -1:
+                    p_next = len(logs)
+                extra = logs[p:p_next].strip()
+                if extra:
+                    output[i] = extra + '\n\n' + output[i]
+                p = p_next
 
             # I will be happy if someone explain to me why the second container does not produce output without a delay
             # works fine on the server

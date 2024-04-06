@@ -13,6 +13,7 @@ do
      ln -fs /data/input"$i".txt ./input.txt
      ln -fs /data/output"$i".txt ./output.txt
      rm -f /data/output"$i".txt
+     >&2 echo '<<<ARBUZ'$i'ARBUZ>>>'
      ./"$4" < /data/input"$i".txt >> ./output.txt 2>&1
    } || true
 done
