@@ -93,11 +93,15 @@ class GeneratorSSADTask2(AbsGenerator):
                 h = random.randint(-5, 50)
                 return f"Create item potion {owner.name} {n} {h}"
             case "spell":
-                m = random.randint(1, min(50, len(self.chars)))
+                t = min(50, len(self.chars))
+                if not t:
+                    return f"Create item spell uwu {n} 1 uwu"
+                else:
+                    m = random.randint(1, t)
                 names = list(self.chars_names)
                 random.shuffle(names)
                 names = names[:m]
-                if m != 0 and random.random() < 0.3:
+                if random.random() < 0.3:
                     names[0] = self.get_char_name()
                 return f"Create item spell {owner.name} {n} {m} {' '.join(names)}"
 
