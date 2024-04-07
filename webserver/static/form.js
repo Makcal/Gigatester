@@ -111,7 +111,7 @@ window.addEventListener("load", () => {
                             }
                         }).then(response => response.json()).then(json => {
                             var verdicts = {
-                                "-1": "Compilation Error",
+                                "-1": "Critical Error",
                                 "2": "Time Limit Exceeded",
                                 "1": "Wrong Answer",
                                 "0": "Arbuz"
