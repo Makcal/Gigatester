@@ -167,8 +167,8 @@ class GeneratorDsaWeek11A(AbsGenerator):
 
 class GeneratorDsaWeek12A(AbsGenerator):
     def generate(self) -> str:
-        small = random.random() < 0.9
-        n = random.randint(1, 10 if small else 100)
+        small = random.random() < 0.95
+        n = random.randint(1, 25 if small else 1000)
         e = random.randint(0, n*(n-1)//2)
         edges = [1]*e + [0]*(n*(n-1)//2 - e)
         random.shuffle(edges)
