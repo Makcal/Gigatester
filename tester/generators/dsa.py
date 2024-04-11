@@ -165,6 +165,25 @@ class GeneratorDsaWeek11A(AbsGenerator):
         return r
 
 
+class GeneratorDsaWeek12A(AbsGenerator):
+    def generate(self) -> str:
+        small = random.random() < 0.9
+        n = random.randint(1, 10 if small else 100)
+        e = random.randint(0, n*(n-1)//2)
+        edges = [1]*e + [0]*(n*(n-1)//2 - e)
+        random.shuffle(edges)
+
+        r = f"{n} {e}\n"
+        k = 0
+        for i in range(n-1):
+            for j in range(i+1, n):
+                if edges[k]:
+                    r += f"{i+1} {j+1} {random.randint(1, 30) * 5}\n"
+                k += 1
+
+        return r
+
+
 __all__ = [
     "GeneratorDsaWeek3A",
     "GeneratorDsaWeek3B",
@@ -175,4 +194,5 @@ __all__ = [
     "GeneratorDsaWeek7A",
     "GeneratorDsaWeek8A",
     "GeneratorDsaWeek11A",
+    "GeneratorDsaWeek12A",
 ]

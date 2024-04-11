@@ -103,3 +103,84 @@ class IntersectingSegmentsChecker(AbsChecker):
         x = -(b2 - b1) / (k2 - k1)
         x = round(x, 10)
         return min(seg1[0], seg1[2]) <= x <= max(seg1[0], seg1[2]) and min(seg2[0], seg2[2]) <= x <= max(seg2[0], seg2[2])
+
+
+# DSA week 12 task A
+class MsfChecker(AbsChecker):
+    class MST:
+        vertices: set[int]
+        min: int
+        weight: int
+
+        def __init__(self):
+            self.vertices = set()
+            self.weight = 0
+            self.min = 99999999
+
+        def add_vertex(self, vertex: int) -> None:
+            self.vertices.add(vertex)
+            self.min = min(self.min, vertex)
+
+        def add_edge(self, vertex1: int, vertex2: int, weight: int) -> None:
+            self.add_vertex(vertex1)
+            self.add_vertex(vertex2)
+            self.weight += weight
+
+    def check(self, expected: str, output: str, input_: str) -> bool:
+        input_ = [line.strip() for line in input_.strip().splitlines()]
+        n_vertices, n_edges = map(int, input_[0].split())
+        graph = [[0] * n_vertices for _ in range(n_vertices)]
+        for i in range(1, n_edges+1):
+            f, t, w = map(int, input_[i].split())
+            graph[f-1][t-1] = graph[t-1][f-1] = w
+
+        expected = [line.strip() for line in expected.strip().splitlines()]
+        output = [line.strip() for line in output.strip().splitlines()]
+        if expected[0] != output[0]:
+            return False
+        components = int(expected[0])
+        trees1, trees2 = [], []
+
+        line_i = 1
+        for i in range(components):
+            msf = MsfChecker.MST()
+            n_tree_vertices, v = map(int, expected[line_i].split())
+            line_i += 1
+            msf.add_vertex(v)
+            for j in range(n_tree_vertices-1):
+                f, t, w = map(int, expected[line_i].split())
+                line_i += 1
+                msf.add_edge(f, t, w)
+            trees1.append(msf)
+
+        line_i = 1
+        for i in range(components):
+            msf = MsfChecker.MST()
+            n_tree_vertices, v = map(int, output[line_i].split())
+            line_i += 1
+            if not 1 <= v <= n_vertices:
+                return False
+            msf.add_vertex(v)
+            for j in range(n_tree_vertices-1):
+                f, t, w = map(int, output[line_i].split())
+                line_i += 1
+                if not 1 <= f <= n_vertices or not 1 <= t <= n_vertices or graph[f-1][t-1] != w:
+                    return False
+                msf.add_edge(f, t, w)
+            if len(msf.vertices) != n_tree_vertices:
+                return False
+            trees2.append(msf)
+
+        check = set()
+        for i in trees2:
+            if check & i.vertices:
+                return False
+            check |= i.vertices
+        if len(check) != n_vertices:
+            return False
+        trees1.sort(key=lambda x: x.min)
+        trees2.sort(key=lambda x: x.min)
+        for i in range(components):
+            if trees1[i].vertices != trees2[i].vertices or trees1[i].weight != trees2[i].weight:
+                return False
+        return True
