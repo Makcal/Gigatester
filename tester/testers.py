@@ -179,6 +179,66 @@ class CppTester(AbsTester):
                     pass
 
 
+class CSharpTester(AbsTester):
+    def _test(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
+        shutil.copyfile(self.local('chore', 'run_cs.sh'), self.local('data', 'run_cs.sh'))
+        shutil.copyfile(self.local('chore', 'cs.csproj'), self.local('data', 'cs.csproj'))
+        shutil.copyfile(file_name, self.local('prog', 'main.cs'))
+
+        try:
+            d: Container = self.docker.containers.run(
+                'mcr.microsoft.com/dotnet/sdk:6.0',
+                detach=True, network_mode='none', working_dir='/work', stderr=True,
+                volumes=[f'{self.local("prog")}:/prog:ro',
+                         f'{self.local("data")}:/data'],
+                command=f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program'
+            )
+            t1 = time.time()
+            while d.status != 'exited':
+                d.reload()
+                time.sleep(1)
+                if time.time() - t1 > timeout:
+                    d.stop(timeout=5)
+                    raise MyTimeoutError()
+
+            if d.logs():
+                raise MyContainerError(d.logs().decode())
+
+            output = []
+            for i in range(n_tests):
+                file = open(self.local('data', f'output{i}.txt'))
+                output.append(file.read().strip())
+                file.close()
+
+            # I will be happy if someone explain to me why the second container does not produce output without a delay
+            # works fine on the server
+            if os.getenv('DEBUG'):
+                time.sleep(5)
+
+            return output
+
+        except docker.errors.ContainerError as e:
+            error_message = e.stderr.decode()
+            if error_message:
+                return [error_message] + ['' for _ in range(n_tests-1)]
+            else:
+                try:
+                    file = open(self.local('data', 'output0.txt'))
+                    error_message = file.read()
+                    file.close()
+                    return [error_message] + ['' for _ in range(n_tests-1)]
+                except IOError:
+                    raise MyContainerError("Unknown error.")
+
+        finally:
+            if 'd' in locals():
+                try:
+                    # noinspection PyUnboundLocalVariable
+                    d.remove()
+                except docker.errors.NotFound:
+                    pass
+
+
 if os.getenv('DEBUG'):
     _docker_engine = docker.DockerClient(base_url='unix://home/max/.docker/desktop/docker.sock')
 else:
@@ -187,10 +247,12 @@ else:
 java_tester = JavaTester(pathlib.Path().absolute(), _docker_engine)
 cpp17_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='17')
 cpp20_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='20')
-TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20'], AbsTester] = {
+cs_tester = CSharpTester(pathlib.Path().absolute(), _docker_engine)
+TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20', 'cs'], AbsTester] = {
     'java': java_tester,
     'cpp17': cpp17_tester,
     'cpp20': cpp20_tester,
+    'cs': cs_tester,
 }
 
 __all__ = ['AbsTester', 'TESTER_DICT']

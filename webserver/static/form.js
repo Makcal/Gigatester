@@ -18,6 +18,8 @@ function getEditorMode(language) {
     switch (language) {
         case "java":
             return "ace/mode/java";
+        case "cs":
+            return "ace/mode/csharp";
         case "cpp17":
         case "cpp20":
             return "ace/mode/c_cpp";
@@ -49,7 +51,7 @@ window.addEventListener("load", () => {
         document.querySelector("#program_contents").value = editor.getValue();
     })
 
-    if (getCookie('language') !== null && ['cpp17', 'cpp20', 'java'].includes(getCookie('language'))) {
+    if (getCookie('language') !== null && ['cpp17', 'cpp20', 'java', 'cs'].includes(getCookie('language'))) {
         document.querySelector(`.lang[data-lang=${getCookie('language')}]`).classList.add("active");
         document.querySelector("#languages").value = getCookie('language');
         document.cookie = `language=${getCookie('language')}`;
