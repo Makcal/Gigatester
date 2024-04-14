@@ -53,7 +53,7 @@ AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp17'
 AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 100, 50)
 
 SSAD_task2 = Task(GeneratorSSADTask2(), ('SSAD_assignment2.cpp', TESTER_DICT['cpp20']), ComparisonChecker(), 300, 90)
-SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), ComparisonChecker(), 200, 100)
+SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), ComparisonChecker(), 80, 120)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
