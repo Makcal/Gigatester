@@ -64,9 +64,11 @@ class JavaTester(AbsTester):
 
             output = []
             for i in range(n_tests):
-                file = open(self.local('data', f'output{i}.txt'))
-                output.append(file.read().strip())
-                file.close()
+                try:
+                    with open(self.local('data', f'output{i}.txt')) as file:
+                        output.append(file.read().strip())
+                except FileNotFoundError:
+                    output.append("")
 
             # I will be happy if someone explain to me why the second container does not produce output without a delay
             # works fine on the server
@@ -201,14 +203,30 @@ class CSharpTester(AbsTester):
                     d.stop(timeout=5)
                     raise MyTimeoutError()
 
-            if d.logs():
-                raise MyContainerError(d.logs().decode())
-
             output = []
             for i in range(n_tests):
-                file = open(self.local('data', f'output{i}.txt'))
-                output.append(file.read().strip())
-                file.close()
+                try:
+                    with open(self.local('data', f'output{i}.txt')) as file:
+                        output.append(file.read().strip())
+                except FileNotFoundError:
+                    output.append("")
+
+            logs: str = d.logs().decode()
+            p = 0
+            for i in range(n_tests):
+                separator = CppTester.test_separator_pattern.format(i)
+                p = logs.find(separator, p)
+                if p == -1:
+                    p = len(logs)
+                else:
+                    p += len(separator)
+                p_next = logs.find(CppTester.test_separator_pattern.format(i+1), p)
+                if p_next == -1:
+                    p_next = len(logs)
+                extra = logs[p:p_next].strip()
+                if extra:
+                    output[i] = extra + '\n\n' + output[i]
+                p = p_next
 
             # I will be happy if someone explain to me why the second container does not produce output without a delay
             # works fine on the server
