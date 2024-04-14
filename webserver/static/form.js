@@ -174,6 +174,14 @@ window.addEventListener("load", () => {
                                     </span>
                                 </span>`);
                                 }
+
+                                const sticker = `
+                                    <img alt=""
+                                        src="/static/failure.webp"
+                                        class="failure-watermelon" />`;
+                                document.body.insertAdjacentHTML("beforeend", sticker);
+                                let failure = document.querySelector(".failure-watermelon");
+                                failure.style.animationPlayState = "running";
                             } else if (json.code === 0) {
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}`;

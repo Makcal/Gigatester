@@ -511,3 +511,42 @@ h1 {
         transform: translate(-50%, -50%) rotate(0deg) translateY(-30px) translateX(-30px);
     }
 }
+
+.failure-watermelon {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    border-radius: 10px;
+    z-index: 50;
+
+    pointer-events: none;
+    visibility: hidden;
+
+    animation-name: failure;
+    animation-play-state: paused;
+    animation-timing-function: ease-in-out;
+    animation-duration: 3s;
+}
+
+@keyframes failure {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    70% {
+        transform: scale(10);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    100% {
+        transform: scale(10);
+        opacity: 0;
+        visibility: visible;
+    }
+}

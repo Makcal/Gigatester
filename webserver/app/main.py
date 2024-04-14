@@ -126,7 +126,7 @@ async def reg(request: Request, call_next):
 
 @app.get("/")
 async def redirect():
-    return RedirectResponse("/static/form.html")
+    return RedirectResponse("/static/form.html?v=1")
 
 """
 API
