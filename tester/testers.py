@@ -224,7 +224,7 @@ class CSharpTester(AbsTester):
                 if p_next == -1:
                     p_next = len(logs)
                 extra = logs[p:p_next].strip()
-                if extra:
+                if extra and 'core dumped' not in extra:
                     output[i] = extra + '\n\n' + output[i]
                 p = p_next
 
