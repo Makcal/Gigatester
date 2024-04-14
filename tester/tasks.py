@@ -6,7 +6,7 @@ from checkers import AbsChecker, WordConcatenatorChecker, AglaIgnoreNegativeZero
 from generators import GeneratorDsaWeek3A, GeneratorDsaWeek3B, GeneratorDsaWeek4A, GeneratorDsaWeek5A, \
     GeneratorDsaWeek5B, GeneratorAgla2Task1, GeneratorAgla2Task2, GeneratorAgla2Task3, GeneratorAgla2Task4, \
     GeneratorAgla2Task5, GeneratorAgla2Task6, GeneratorDsaWeek6A, GeneratorDsaWeek7A, GeneratorDsaWeek8A, \
-    GeneratorAgla2Task7, GeneratorSSADTask2, GeneratorDsaWeek11A, GeneratorDsaWeek12A
+    GeneratorAgla2Task7, GeneratorSSADTask2, GeneratorDsaWeek11A, GeneratorDsaWeek12A, GeneratorSSADTask3
 from testers import TESTER_DICT
 from checkers import ComparisonChecker
 
@@ -53,6 +53,7 @@ AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp17'
 AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 100, 50)
 
 SSAD_task2 = Task(GeneratorSSADTask2(), ('SSAD_assignment2.cpp', TESTER_DICT['cpp20']), ComparisonChecker(), 400, 90)
+SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), ComparisonChecker(), 300, 90)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
@@ -73,6 +74,7 @@ TASK_DICT: dict[str, Task] = {
     'AGLA2_task6': AGLA_task6,
     'AGLA2_task7': AGLA_task7,
     'SSAD_task2': SSAD_task2,
+    'SSAD_task3': SSAD_task3,
 }
 
 __all__ = ['Task', 'TASK_DICT']

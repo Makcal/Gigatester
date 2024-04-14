@@ -161,13 +161,13 @@ class GeneratorSSADTask2(AbsGenerator):
     CHAR_NAMES = ("max", "munir", "harry", "oleg", "cat", "mummy", "zlata", "dd", "dan")
     ITEM_NAMES = ("sword", "arbuz", "wand", "pen", "laser", "rocket", "bdsm")
     ALPH = 'abcerwocnspq'
-    
+
     def get_random_name(self):
         sl = list(self.ALPH)
         random.shuffle(sl)
         s = ''.join(sl[:random.randint(3, 10)])
         return s
-    
+
     def get_char_name(self):
         i = 0
         while i < len(self.CHAR_NAMES) and self.CHAR_NAMES[i] in self.chars_names:
@@ -176,10 +176,10 @@ class GeneratorSSADTask2(AbsGenerator):
             s = self.get_random_name()
             while s in self.chars_names:
                 s = self.get_random_name()
-            return s 
+            return s
         else:
             return self.CHAR_NAMES[i]
-    
+
     def get_item_name(self):
         i = 0
         while i < len(self.ITEM_NAMES) and self.ITEM_NAMES[i] in self.item_names:
@@ -188,7 +188,7 @@ class GeneratorSSADTask2(AbsGenerator):
             s = self.get_random_name()
             while s in self.item_names:
                 s = self.get_random_name()
-            return s 
+            return s
         else:
             return self.ITEM_NAMES[i]
 
@@ -200,4 +200,98 @@ class GeneratorSSADTask2(AbsGenerator):
         return c
 
 
-__all__ = ['GeneratorSSADTask2']
+class GeneratorSSADTask3(AbsGenerator):
+    chars_names: set[str]
+
+    def __init__(self):
+        self.chars_names = set()
+        self.result = ""
+
+    def generate(self) -> str:
+        self.chars_names = set()
+        self.result = ""
+        n = random.randint(1, 200 if random.random() < 0.05 else 40)
+        i = 0
+        self.result = f"{n}\n"
+        while i < n:
+            if i == 0 and random.random() < 0.9:
+                cmd = 'create_account'
+            else:
+                cmd = random.choices(
+                    ['create_account', 'deposit', 'withdraw', 'transfer', 'view', 'deactivate', 'activate'],
+                    [15,                  5,          3,           3,        3,        3,            3],
+                )[0]
+            res = getattr(self, cmd)()
+            self.result += res + '\n'
+            i += 1
+
+        return self.result
+
+    ACC_TYPES = ("Savings", "Checking", "Business")
+
+    def create_account(self) -> str:
+        type = random.choice(self.ACC_TYPES)
+        name = self.get_name()
+        initial_dep = random.randint(100, 90 * 100) * 5 / 100
+
+        self.chars_names.add(name)
+        return f"Create Account {type} {name} {initial_dep}"
+
+    def deposit(self) -> str:
+        depositor = self.choose_char()
+        amount = random.randint(100, 90 * 100) * 5 / 100
+        return f"Deposit {depositor} {amount}"
+
+    def withdraw(self) -> str:
+        user = self.choose_char()
+        amount = random.randint(100, (30 if random.random() < 0.66 else 1000) * 100) * 5 / 100
+        return f"Withdraw {user} {amount}"
+
+    def transfer(self) -> str:
+        user = self.choose_char()
+        target = self.choose_char()
+        amount = random.randint(100, (30 if random.random() < 0.66 else 1000) * 100) * 5 / 100
+        return f"Transfer {user} {target} {amount}"
+
+    def view(self) -> str:
+        name = self.choose_char()
+        return f"View {name}"
+
+    def deactivate(self) -> str:
+        name = self.choose_char()
+        return f"Deactivate {name}"
+
+    def activate(self) -> str:
+        name = self.choose_char()
+        return f"Activate {name}"
+
+    CHAR_NAMES = ("max", "munir", "john", "bob", "alice", "vanya", "mazhor", "arbuz", "shizov", "marco")
+    ALPH = 'abcerwocnspq'
+
+    def get_random_name(self):
+        sl = list(self.ALPH)
+        random.shuffle(sl)
+        s = ''.join(sl[:random.randint(3, 10)])
+        return s
+
+    def get_name(self):
+        i = 0
+        while i < len(self.CHAR_NAMES) and self.CHAR_NAMES[i] in self.chars_names:
+            i += 1
+        if i == len(self.CHAR_NAMES):
+            s = self.get_random_name()
+            while s in self.chars_names:
+                s = self.get_random_name()
+            return s
+        else:
+            return self.CHAR_NAMES[i]
+
+    def choose_char(self):
+        if random.random() < 0.95 and self.chars_names:
+            c = random.choice(tuple(self.chars_names))
+        else:
+            c = 'notexists'
+        return c
+
+
+__all__ = ['GeneratorSSADTask2', 'GeneratorSSADTask3']
