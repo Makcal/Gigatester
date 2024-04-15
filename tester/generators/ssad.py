@@ -227,30 +227,34 @@ class GeneratorSSADTask3(AbsGenerator):
 
         return self.result
 
+    @staticmethod
+    def get_float(a: int, b: int) -> float:
+        return random.randint(2*a, 2*b) / 2
+
     ACC_TYPES = ("Savings", "Checking", "Business")
 
     def create_account(self) -> str:
         type = random.choice(self.ACC_TYPES)
         name = self.get_name()
-        initial_dep = random.randint(100, 90 * 100) * 5 / 100
+        initial_dep = self.get_float(1, 450)
 
         self.chars_names.add(name)
         return f"Create Account {type} {name} {initial_dep}"
 
     def deposit(self) -> str:
         depositor = self.choose_char()
-        amount = random.randint(100, 90 * 100) * 5 / 100
+        amount = self.get_float(1, 450)
         return f"Deposit {depositor} {amount}"
 
     def withdraw(self) -> str:
         user = self.choose_char()
-        amount = random.randint(100, (30 if random.random() < 0.66 else 1000) * 100) * 5 / 100
+        amount = self.get_float(1, 150 if random.random() < 0.66 else 5000)
         return f"Withdraw {user} {amount}"
 
     def transfer(self) -> str:
         user = self.choose_char()
         target = self.choose_char()
-        amount = random.randint(100, (30 if random.random() < 0.66 else 1000) * 100) * 5 / 100
+        amount = self.get_float(1, 150 if random.random() < 0.66 else 5000)
         return f"Transfer {user} {target} {amount}"
 
     def view(self) -> str:
