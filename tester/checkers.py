@@ -40,7 +40,7 @@ class BalancedTreeChecker(AbsChecker):
 
     def check_balance(self, graph: list[list[int]], i: int) -> tuple[bool, int, int, int]:
         if i == -2:
-            return True, 0, -1, 10**9
+            return True, 0, -1, 10 ** 9
         if i in self.visited:
             return False, -1, -1, -1
         self.visited.add(i)
@@ -102,7 +102,8 @@ class IntersectingSegmentsChecker(AbsChecker):
         b2 = seg2[1] - k2 * seg2[0]
         x = -(b2 - b1) / (k2 - k1)
         x = round(x, 10)
-        return min(seg1[0], seg1[2]) <= x <= max(seg1[0], seg1[2]) and min(seg2[0], seg2[2]) <= x <= max(seg2[0], seg2[2])
+        return min(seg1[0], seg1[2]) <= x <= max(seg1[0], seg1[2]) and min(seg2[0], seg2[2]) <= x <= max(seg2[0],
+                                                                                                         seg2[2])
 
 
 # DSA week 12 task A
@@ -130,9 +131,9 @@ class MsfChecker(AbsChecker):
         input_ = [line.strip() for line in input_.strip().splitlines()]
         n_vertices, n_edges = map(int, input_[0].split())
         graph = [[0] * n_vertices for _ in range(n_vertices)]
-        for i in range(1, n_edges+1):
+        for i in range(1, n_edges + 1):
             f, t, w = map(int, input_[i].split())
-            graph[f-1][t-1] = graph[t-1][f-1] = w
+            graph[f - 1][t - 1] = graph[t - 1][f - 1] = w
 
         expected = [line.strip() for line in expected.strip().splitlines()]
         output = [line.strip() for line in output.strip().splitlines()]
@@ -147,7 +148,7 @@ class MsfChecker(AbsChecker):
             n_tree_vertices, v = map(int, expected[line_i].split())
             line_i += 1
             msf.add_vertex(v)
-            for j in range(n_tree_vertices-1):
+            for j in range(n_tree_vertices - 1):
                 f, t, w = map(int, expected[line_i].split())
                 line_i += 1
                 msf.add_edge(f, t, w)
@@ -161,10 +162,10 @@ class MsfChecker(AbsChecker):
             if not 1 <= v <= n_vertices:
                 return False
             msf.add_vertex(v)
-            for j in range(n_tree_vertices-1):
+            for j in range(n_tree_vertices - 1):
                 f, t, w = map(int, output[line_i].split())
                 line_i += 1
-                if not 1 <= f <= n_vertices or not 1 <= t <= n_vertices or graph[f-1][t-1] != w:
+                if not 1 <= f <= n_vertices or not 1 <= t <= n_vertices or graph[f - 1][t - 1] != w:
                     return False
                 msf.add_edge(f, t, w)
             if len(msf.vertices) != n_tree_vertices:
@@ -184,3 +185,32 @@ class MsfChecker(AbsChecker):
             if trees1[i].vertices != trees2[i].vertices or trees1[i].weight != trees2[i].weight:
                 return False
         return True
+
+
+class FloatFixedPrecisionChecker(AbsChecker):
+    precision: float
+    digits: int
+    regex: re.Pattern[str] | str
+
+    def __init__(self, digits: int):
+        self.precision = 10**(-digits) * 1.5
+        self.digits = digits
+        self.regex = r"\d+\.\d{%s}" % digits
+
+    def check(self, expected: str, output: str, input_: str) -> bool:
+        output_floats = re.finditer(self.regex, output)
+        expected_floats = re.finditer(self.regex, expected)
+        while True:
+            out = next(output_floats, None)
+            exp = next(expected_floats, None)
+            if out is None and exp is None:
+                break
+            if out is None or exp is None:
+                return False
+            if abs(float(out.group()) - float(exp.group())) < self.precision:
+                continue
+            return False
+
+        output = re.sub(self.regex, "", output)
+        expected = re.sub(self.regex, "", expected)
+        return ComparisonChecker().check(expected, output, input_)
