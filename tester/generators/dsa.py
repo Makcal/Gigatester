@@ -186,12 +186,12 @@ class GeneratorDsaWeek12A(AbsGenerator):
 
 class GeneratorDsaWeek13A(AbsGenerator):
     def generate(self) -> str:
-        small = random.random() < 0.95
+        small = random.random() < 0.9
         n = random.randint(1, 10 if small else 100)
 
         r = f"{n}\n"
         for i in range(n):
-            r += f"{' '.join(str(random.randint(-9, 8) if random.random() < 0.7 else 100000) for _ in range(n))}\n"
+            r += f"{' '.join(str(random.randint(-9, 15) if random.random() < 0.7 else 100000) for _ in range(n))}\n"
 
         return r
 
