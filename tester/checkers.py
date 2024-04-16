@@ -214,3 +214,30 @@ class FloatFixedPrecisionChecker(AbsChecker):
         output = re.sub(self.regex, "", output)
         expected = re.sub(self.regex, "", expected)
         return ComparisonChecker().check(expected, output, input_)
+
+
+class NegativeCycleChecker(AbsChecker):
+    def check(self, expected: str, output: str, input_: str) -> bool:
+        expected = [line.strip() for line in expected.strip().splitlines()]
+        output = [line.strip() for line in output.strip().splitlines()]
+        if expected[0] != output[0]:
+            return False
+        if expected[0] == "NO":
+            return True
+        m = int(output[1])
+        cycle = list(map(int, output[2].split()))
+        if len(cycle) != m:
+            return False
+
+        input_ = [line.strip() for line in input_.strip().splitlines()]
+        n = int(input_[0])
+        graph = [list(map(int, line.split())) for line in input_[1:]]
+        total_weight = 0
+        for i in range(-1, m-1):
+            w = graph[cycle[i] - 1][cycle[i+1] - 1]
+            if w == 100000:
+                return False
+            total_weight += w
+        if total_weight < 0:
+            return True
+        return False

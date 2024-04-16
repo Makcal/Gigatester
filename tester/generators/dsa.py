@@ -184,6 +184,18 @@ class GeneratorDsaWeek12A(AbsGenerator):
         return r
 
 
+class GeneratorDsaWeek13A(AbsGenerator):
+    def generate(self) -> str:
+        small = random.random() < 0.95
+        n = random.randint(1, 10 if small else 100)
+
+        r = f"{n}\n"
+        for i in range(n):
+            r += f"{' '.join(str(random.randint(-9, 8) if random.random() < 0.7 else 100000) for _ in range(n))}\n"
+
+        return r
+
+
 __all__ = [
     "GeneratorDsaWeek3A",
     "GeneratorDsaWeek3B",
@@ -195,4 +207,5 @@ __all__ = [
     "GeneratorDsaWeek8A",
     "GeneratorDsaWeek11A",
     "GeneratorDsaWeek12A",
+    "GeneratorDsaWeek13A",
 ]
