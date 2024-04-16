@@ -208,6 +208,15 @@ class GeneratorSSADTask3(AbsGenerator):
         self.result = ""
 
     def generate(self) -> str:
+        if random.random() < 0.03:
+            return """4
+Create Account Savings max 309.5
+Withdraw max 309.5
+Create Account Savings munir 270.5
+Create Account Savings zouev 1.0
+Transfer munir zouev 270.5
+"""
+
         self.chars_names = set()
         self.result = ""
         n = random.randint(1, 200 if random.random() < 0.05 else 40)
@@ -234,12 +243,12 @@ class GeneratorSSADTask3(AbsGenerator):
     ACC_TYPES = ("Savings", "Checking", "Business")
 
     def create_account(self) -> str:
-        type = random.choice(self.ACC_TYPES)
+        type_ = random.choice(self.ACC_TYPES)
         name = self.get_name()
         initial_dep = self.get_float(1, 450)
 
         self.chars_names.add(name)
-        return f"Create Account {type} {name} {initial_dep}"
+        return f"Create Account {type_} {name} {initial_dep}"
 
     def deposit(self) -> str:
         depositor = self.choose_char()
