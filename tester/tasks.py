@@ -39,7 +39,7 @@ DSA_week7A = Task(GeneratorDsaWeek7A(), ('DSA_week7A.cpp', TESTER_DICT['cpp17'])
 DSA_week8A = Task(GeneratorDsaWeek8A(), ('DSA_week8A.cpp', TESTER_DICT['cpp17']), IntersectingSegmentsChecker(), 150, 70)
 DSA_week11A = Task(GeneratorDsaWeek11A(), ('DSA_week11A.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 100, 30)
 DSA_week12A = Task(GeneratorDsaWeek12A(), ('DSA_week12A.cpp', TESTER_DICT['cpp17']), MsfChecker(), 50, 150)
-DSA_week13A = Task(GeneratorDsaWeek13A(), ('DSA_week13A.cpp', TESTER_DICT['cpp17']), NegativeCycleChecker(), 200, 150)
+DSA_week13A = Task(GeneratorDsaWeek13A(), ('DSA_week13A.cpp', TESTER_DICT['cpp17']), NegativeCycleChecker(), 200, 200)
 
 AGLA_task1 = Task(GeneratorAgla2Task1(), ('AGLA2_task1.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 30)
 AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 30)
@@ -50,7 +50,7 @@ AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp17'
 AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 100, 50)
 
 SSAD_task2 = Task(GeneratorSSADTask2(), ('SSAD_assignment2.cpp', TESTER_DICT['cpp20']), ComparisonChecker(), 300, 90)
-SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), FloatFixedPrecisionChecker(3), 80, 120)
+SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), FloatFixedPrecisionChecker(3), 80, 180)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
