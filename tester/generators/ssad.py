@@ -300,7 +300,7 @@ Transfer munir zouev 270.5
             return self.CHAR_NAMES[i]
 
     def choose_char(self):
-        if random.random() < 0.95 and self.chars_names:
+        if random.random() < 0.85 and self.chars_names:
             c = random.choice(tuple(self.chars_names))
         else:
             c = 'notexists'
