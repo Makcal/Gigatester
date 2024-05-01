@@ -159,7 +159,7 @@ class GeneratorAgla2Task9(AbsGenerator):
 class GeneratorAgla2Task10(AbsGenerator):
     @classmethod
     def random_float(cls):
-        return 0.01 + round(random.random()*0.99, 2)
+        return round(0.01 + random.random()*0.99, 2)
 
     def generate(self) -> str:
         return (f"{random.randint(10, 100)} {random.randint(10, 100)}\n"

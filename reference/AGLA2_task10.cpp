@@ -369,25 +369,27 @@ int main() {
     cin >> v0 >> k0 >> a1 >> b1 >> a2 >> b2 >> T >> N;
     PredatorPreyModel pp(v0, k0, a1, b1, a2, b2);
 
-    cout << "t:\n";
+    cout << "t: ";
     double step = T/N;
-    for (double t = 0; t <= T; t += step) {
+    for (int i = 0; i <= N; i++) {
+        double t = T/N * i;
         cout << t << ' ';
     }
     cout << '\n';
 
     vector<pair<double, double>> v;
-    for (double t = 0; t <= T; t += step) {
+    for (int i = 0; i <= N; i++) {
+        double t = T/N * i;
         v.push_back(pp.atTime(t));
     }
 
-    cout << "v:\n";
+    cout << "v: ";
     for (const auto& p: v) {
         cout << p.first << ' ';
     }
     cout << '\n';
 
-    cout << "k:\n";
+    cout << "k: ";
     for (const auto& p: v) {
         cout << p.second << ' ';
     }
