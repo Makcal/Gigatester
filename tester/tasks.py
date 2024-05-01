@@ -48,9 +48,9 @@ AGLA_task4 = Task(GeneratorAgla2Task4(), ('AGLA2_task4.cpp', TESTER_DICT['cpp17'
 AGLA_task5 = Task(GeneratorAgla2Task5(), ('AGLA2_task5.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 100, 50)
 AGLA_task6 = Task(GeneratorAgla2Task6(), ('AGLA2_task6.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 100, 50)
 AGLA_task7 = Task(GeneratorAgla2Task7(), ('AGLA2_task7.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 100, 50)
-AGLA_task8 = Task(GeneratorAgla2Task8(), ('AGLA2_task8.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 50)
-AGLA_task9 = Task(GeneratorAgla2Task9(), ('AGLA2_task9.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 50)
-AGLA_task10 = Task(GeneratorAgla2Task10(), ('AGLA2_task10.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 50)
+AGLA_task8 = Task(GeneratorAgla2Task8(), ('AGLA2_task8.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 70, 50)
+AGLA_task9 = Task(GeneratorAgla2Task9(), ('AGLA2_task9.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 70, 50)
+AGLA_task10 = Task(GeneratorAgla2Task10(), ('AGLA2_task10.cpp', TESTER_DICT['cpp17']), AglaIgnoreNegativeZerosChecker(), 70, 50)
 
 SSAD_task2 = Task(GeneratorSSADTask2(), ('SSAD_assignment2.cpp', TESTER_DICT['cpp20']), ComparisonChecker(), 300, 90)
 SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), FloatFixedPrecisionChecker(3), 80, 180)
