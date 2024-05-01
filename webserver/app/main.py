@@ -40,6 +40,9 @@ TASKS = Literal[
     'AGLA2_task5',
     'AGLA2_task6',
     'AGLA2_task7',
+    'AGLA2_task8',
+    'AGLA2_task9',
+    'AGLA2_task10',
     'SSAD_task2',
     'SSAD_task3',
 ]
@@ -62,9 +65,14 @@ TASK_NAMES = {
     'AGLA2_task5': 'AGLA II. Task 5.',
     'AGLA2_task6': 'AGLA II. Task 6.',
     'AGLA2_task7': 'AGLA II. Task 7.',
+    'AGLA2_task8': 'AGLA II. Task 8.',
+    'AGLA2_task9': 'AGLA II. Task 9.',
+    'AGLA2_task10': 'AGLA II. Task 10.',
     'SSAD_task2': 'SSAD. Assignment 2.',
     'SSAD_task3': 'SSAD. Assignment 3.',
 }
+
+VERSION_ID = "2"
 
 app = FastAPI()
 app.add_middleware(
@@ -108,7 +116,7 @@ async def reg(request: Request, call_next):
         return await call_next(request)
 
     if request.client.host in ban_list:
-        return RedirectResponse("/static/form.html", status.HTTP_302_FOUND)
+        return RedirectResponse(f"/static/form.html", status.HTTP_302_FOUND)
 
     user_id = request.cookies.get('user_id')
     if user_id is not None or request.url.path.startswith('/static/'):
@@ -128,7 +136,7 @@ async def reg(request: Request, call_next):
 
 @app.get("/")
 async def redirect():
-    return RedirectResponse("/static/form.html?v=1")
+    return RedirectResponse(f"/static/form.html?v={VERSION_ID}")
 
 """
 API

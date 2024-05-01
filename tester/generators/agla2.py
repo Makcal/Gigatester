@@ -136,6 +136,37 @@ class GeneratorAgla2Task7(AbsGenerator):
         return res
 
 
+class GeneratorAgla2Task8(AbsGenerator):
+    def generate(self) -> str:
+        n = random.randint(2, 5)
+        m = ""
+        for i in range(n):
+            a = []
+            for j in range(n):
+                a.append(random.randint(-5, 5))
+            if random.random() < 0.93:
+                a[i] = sum(abs(x) for idx, x in enumerate(a) if idx != i) + random.randint(1, 5)
+            m += ' '.join(str(i) for i in a) + '\n'
+        n2 = n if random.random() < 0.9 else 1
+        return f"{n}\n{m}{n2}\n{gen_matrix(1, n2)}{round(random.random()*0.99 + 0.01, 2)}\n"
+
+
+class GeneratorAgla2Task9(AbsGenerator):
+    def generate(self) -> str:
+        return GeneratorAgla2Task8().generate()
+
+
+class GeneratorAgla2Task10(AbsGenerator):
+    @classmethod
+    def random_float(cls):
+        return 0.01 + round(random.random()*0.99, 2)
+
+    def generate(self) -> str:
+        return (f"{random.randint(10, 100)} {random.randint(10, 100)}\n"
+                f"{self.random_float()} {self.random_float()} {self.random_float()} {self.random_float()}\n"
+                f"{random.randint(10, 100)} {random.randint(10, 100)}\n")
+
+
 __all__ = [
     'GeneratorAgla2Task1',
     'GeneratorAgla2Task2',
@@ -144,4 +175,7 @@ __all__ = [
     'GeneratorAgla2Task5',
     'GeneratorAgla2Task6',
     'GeneratorAgla2Task7',
+    'GeneratorAgla2Task8',
+    'GeneratorAgla2Task9',
+    'GeneratorAgla2Task10',
 ]
