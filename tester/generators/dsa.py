@@ -206,7 +206,7 @@ class GeneratorDsaWeek15A(AbsGenerator):
         random.shuffle(self.NAMES)
 
     def generate(self) -> str:
-        n = random.randint(1, 15 if random.random() < 0.9 else 125)
+        n = random.randint(1, 15 if random.random() < 0.5 else 600)
         r = f"{n}\n"
         for i in range(n):
             cmd = random.choices((1, 2, 3, 4), (3, 1, 0.5, 2))[0]

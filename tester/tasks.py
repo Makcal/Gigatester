@@ -40,7 +40,7 @@ DSA_week8A = Task(GeneratorDsaWeek8A(), ('DSA_week8A.cpp', TESTER_DICT['cpp17'])
 DSA_week11A = Task(GeneratorDsaWeek11A(), ('DSA_week11A.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 100, 30)
 DSA_week12A = Task(GeneratorDsaWeek12A(), ('DSA_week12A.cpp', TESTER_DICT['cpp17']), MsfChecker(), 50, 150)
 DSA_week13A = Task(GeneratorDsaWeek13A(), ('DSA_week13A.cpp', TESTER_DICT['cpp17']), NegativeCycleChecker(), 200, 200)
-DSA_week15A = Task(GeneratorDsaWeek15A(), ('DSA_week15A.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 200, 120)
+DSA_week15A = Task(GeneratorDsaWeek15A(), ('DSA_week15A.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 150, 300)
 
 AGLA_task1 = Task(GeneratorAgla2Task1(), ('AGLA2_task1.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 30)
 AGLA_task2 = Task(GeneratorAgla2Task2(), ('AGLA2_task2.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 70, 30)
