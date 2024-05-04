@@ -46,6 +46,7 @@ TASKS = Literal[
     'AGLA2_task10',
     'SSAD_task2',
     'SSAD_task3',
+    'SSAD_task4',
 ]
 TASK_NAMES = {
     'DSA_week3A': 'DSA week 3. Task A.',
@@ -72,6 +73,7 @@ TASK_NAMES = {
     'AGLA2_task10': 'AGLA II. Task 10.',
     'SSAD_task2': 'SSAD. Assignment 2.',
     'SSAD_task3': 'SSAD. Assignment 3.',
+    'SSAD_task4': 'SSAD. Assignment 4.',
 }
 
 VERSION_ID = "2"

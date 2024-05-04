@@ -307,4 +307,117 @@ Transfer munir zouev 270.5
         return c
 
 
-__all__ = ['GeneratorSSADTask2', 'GeneratorSSADTask3']
+class GeneratorSSADTask4(AbsGenerator):
+    chars_names: set[str]
+    titles: set[str]
+
+    def __init__(self):
+        self.chars_names = set()
+        self.titles = set()
+        self.result = ""
+
+    def generate(self) -> str:
+        self.chars_names = set()
+        self.titles = set()
+        self.result = ""
+        n = random.randint(2, 200 if random.random() < 0.05 else 40)
+        i = 0
+        while i < n:
+            if i == 0:
+                cmd = 'create_book'
+            elif i == 1:
+                cmd = 'create_user'
+            else:
+                cmd = random.choices(
+                    ['create_book', 'create_user', 'subscribe', 'unsubscribe', 'update_price', 'read_book', 'listen_book'],
+                    [7,                  7,          7,           5,            7,                 5,               5],
+                )[0]
+            res = getattr(self, cmd)()
+            self.result += res + '\n'
+            i += 1
+
+        return self.result + 'end\n'
+
+    @staticmethod
+    def get_float(a: int, b: int) -> str:
+        return str(round(a + (b-a)*random.random(), 2))
+
+    ACC_TYPES = ("standard", "premium")
+
+    def create_user(self) -> str:
+        type_ = random.choice(self.ACC_TYPES)
+        name = self.get_name()
+
+        self.chars_names.add(name)
+        return f"createUser {type_} {name}"
+
+    def create_book(self) -> str:
+        title = self.get_title()
+
+        self.titles.add(title)
+        return f"createBook {title} EvoleoTolstoy {self.get_float(1, 100)}"
+
+    def subscribe(self) -> str:
+        return f"subscribe {self.choose_char()}"
+
+    def unsubscribe(self) -> str:
+        return f"unsubscribe {self.choose_char()}"
+
+    def update_price(self) -> str:
+        title = self.choose_title()
+        return f"updatePrice {title} {self.get_float(1, 100)}"
+
+    def read_book(self) -> str:
+        name = self.choose_char()
+        title = self.choose_title()
+        return f"readBook {name} {title}"
+
+    def listen_book(self) -> str:
+        name = self.choose_char()
+        title = self.choose_title()
+        return f"readBook {name} {title}"
+
+    CHAR_NAMES = ("max", "munir", "john", "bob", "alice", "vanya", "mazhor", "arbuz", "rash")
+    TITLES = ("book", "javafordummies", "cppisthebest", "patternssuck", "biblia", "nature")
+    ALPH = 'abcerwocnspq'
+
+    def get_random_name(self):
+        sl = list(self.ALPH)
+        random.shuffle(sl)
+        s = ''.join(sl[:random.randint(3, 10)])
+        return s
+
+    def get_name(self):
+        i = 0
+        while i < len(self.CHAR_NAMES) and self.CHAR_NAMES[i] in self.chars_names:
+            i += 1
+        if i == len(self.CHAR_NAMES):
+            s = self.get_random_name()
+            while s in self.chars_names:
+                s = self.get_random_name()
+            return s
+        else:
+            return self.CHAR_NAMES[i]
+
+    def get_title(self):
+        i = 0
+        while i < len(self.TITLES) and self.TITLES[i] in self.titles:
+            i += 1
+        if i == len(self.TITLES):
+            s = self.get_random_name()
+            while s in self.titles:
+                s = self.get_random_name()
+            return s
+        else:
+            return self.TITLES[i]
+
+    def choose_char(self):
+        c = random.choice(tuple(self.chars_names))
+        return c
+
+    def choose_title(self):
+        c = random.choice(tuple(self.titles))
+        return c
+
+
+__all__ = ['GeneratorSSADTask2', 'GeneratorSSADTask3', 'GeneratorSSADTask4']

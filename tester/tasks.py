@@ -55,6 +55,7 @@ AGLA_task10 = Task(GeneratorAgla2Task10(), ('AGLA2_task10.cpp', TESTER_DICT['cpp
 
 SSAD_task2 = Task(GeneratorSSADTask2(), ('SSAD_assignment2.cpp', TESTER_DICT['cpp20']), ComparisonChecker(), 300, 90)
 SSAD_task3 = Task(GeneratorSSADTask3(), ('SSAD_assignment3.java', TESTER_DICT['java']), FloatFixedPrecisionChecker(3), 80, 180)
+SSAD_task4 = Task(GeneratorSSADTask4(), ('SSAD_assignment4.cpp', TESTER_DICT['cpp17']), ComparisonChecker(), 200, 180)
 
 TASK_DICT: dict[str, Task] = {
     'DSA_week3A': DSA_week3A,
@@ -81,6 +82,7 @@ TASK_DICT: dict[str, Task] = {
     'AGLA2_task10': AGLA_task10,
     'SSAD_task2': SSAD_task2,
     'SSAD_task3': SSAD_task3,
+    'SSAD_task4': SSAD_task4,
 }
 
 __all__ = ['Task', 'TASK_DICT']
