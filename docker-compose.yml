@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  webserver:
+    build:
+      context: webserver
+    image: makcal3000/gigatester-webserver
+    ports:
+      - "80:8000"
+    environment:
+      - SECRET=$SECRET
+      - MAX_QUEUE=350
+      - MAX_REG=5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 500M
+    volumes:
+      - './queue:/queue'
+      - './webserver:/prog'
+    logging:
+      driver: loki
+      options:
+        loki-url: $LOKI_URL
