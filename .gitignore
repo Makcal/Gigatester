@@ -162,4 +162,4 @@ cython_debug/
 data/*
 !data/run.sh
 prog/*
-reference/bad*
+reference/*
