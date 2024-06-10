@@ -1,1 +1,1 @@
-A testing system for codeforces and similaer tasks made for Innopolis B23 students
+A testing system for codeforces and similar tasks made for Innopolis students
