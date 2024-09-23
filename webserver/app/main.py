@@ -22,58 +22,10 @@ LANGUAGE_NAMES = {
     'cs': 'C# 10',
 }
 TASKS = Literal[
-    'DSA_week3A',
-    'DSA_week3B',
-    'DSA_week4A',
-    'DSA_week5A',
-    'DSA_week5B',
-    'DSA_week6A',
-    'DSA_week7A',
-    'DSA_week8A',
-    'DSA_week11A',
-    'DSA_week12A',
-    'DSA_week13A',
-    'DSA_week15A',
-    'AGLA2_task1',
-    'AGLA2_task2',
-    'AGLA2_task3',
-    'AGLA2_task4',
-    'AGLA2_task5',
-    'AGLA2_task6',
-    'AGLA2_task7',
-    'AGLA2_task8',
-    'AGLA2_task9',
-    'AGLA2_task10',
-    'SSAD_task2',
-    'SSAD_task3',
-    'SSAD_task4',
+    'internal_task_id',
 ]
 TASK_NAMES = {
-    'DSA_week3A': 'DSA week 3. Task A.',
-    'DSA_week3B': 'DSA week 3. Task B.',
-    'DSA_week4A': 'DSA week 4. Task A.',
-    'DSA_week5A': 'DSA week 5. Task A.',
-    'DSA_week5B': 'DSA week 5. Task B.',
-    'DSA_week6A': 'DSA week 6. Task A.',
-    'DSA_week7A': 'DSA week 7. Task A.',
-    'DSA_week8A': 'DSA week 8. Task A.',
-    'DSA_week11A': 'DSA week 11. Task A.',
-    'DSA_week12A': 'DSA week 12. Task A.',
-    'DSA_week13A': 'DSA week 13. Task A.',
-    'DSA_week15A': 'DSA week 15. Task A.',
-    'AGLA2_task1': 'AGLA II. Task 1.',
-    'AGLA2_task2': 'AGLA II. Task 2.',
-    'AGLA2_task3': 'AGLA II. Task 3.',
-    'AGLA2_task4': 'AGLA II. Task 4.',
-    'AGLA2_task5': 'AGLA II. Task 5.',
-    'AGLA2_task6': 'AGLA II. Task 6.',
-    'AGLA2_task7': 'AGLA II. Task 7.',
-    'AGLA2_task8': 'AGLA II. Task 8.',
-    'AGLA2_task9': 'AGLA II. Task 9.',
-    'AGLA2_task10': 'AGLA II. Task 10.',
-    'SSAD_task2': 'SSAD. Assignment 2.',
-    'SSAD_task3': 'SSAD. Assignment 3.',
-    'SSAD_task4': 'SSAD. Assignment 4.',
+    'internal_task_id': 'Visual Task Name',
 }
 
 VERSION_ID = "2"
@@ -142,6 +94,7 @@ async def reg(request: Request, call_next):
 async def redirect():
     return RedirectResponse(f"/static/form.html?v={VERSION_ID}")
 
+
 """
 API
 """
@@ -149,7 +102,8 @@ API
 
 @app.post('/submit')
 async def form(background_tasks: BackgroundTasks,
-               language: Annotated[LANGUAGES, Form()], task: Annotated[TASKS, Form()],
+               language: Annotated[LANGUAGES, Form()],
+               task: Annotated[TASKS, Form()],
                program: Annotated[str, Form()] = None,
                user_id: Annotated[str, Cookie()] = None):
     if program is None or program == "":
