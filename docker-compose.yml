@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   webserver:
     build:
@@ -19,7 +17,7 @@ services:
     volumes:
       - './queue:/queue'
       - './webserver:/prog'
-    logging:
-      driver: loki
-      options:
-        loki-url: $LOKI_URL
+#    logging:
+#      driver: loki
+#      options:
+#        loki-url: $LOKI_URL

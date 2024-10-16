@@ -1,6 +1,6 @@
 # Dockerfile from https://github.com/python-poetry/poetry/discussions/1879
 # `python-base` sets up all our shared environment variables
-FROM python:3.11-slim-buster as python-base
+FROM python:3.11-slim-buster AS python-base
 ENV PYTHONUNBUFFERED=1 \
     # prevents python creating .pyc as files
     PYTHONDONTWRITEBYTECODE=1 \
@@ -31,7 +31,7 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 
 # `builder-base` stage is used to build deps + create our virtual environment
-FROM python-base as builder-base
+FROM python-base AS builder-base
 RUN apt-get update && apt-get install --no-install-recommends -y \
     # deps for installing poetry
     curl \
@@ -50,7 +50,7 @@ RUN poetry install --no-dev
 
 
 # `production` image used for runtime
-FROM python-base as production
+FROM python-base AS production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 WORKDIR /prog

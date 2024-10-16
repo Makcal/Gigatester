@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "gigatester"
+version = "0.1.0"
+description = ""
+authors = ["Maxim Fomin <m.fomin@innopolis.university>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

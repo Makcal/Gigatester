@@ -1,6 +1,6 @@
 from random import randint
 
-from tester.generators import AbsGenerator
+from .abs_generator import AbsGenerator
 
 
 class ExampleGenerator(AbsGenerator):
