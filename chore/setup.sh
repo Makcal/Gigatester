@@ -18,12 +18,11 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo docker pull makcal3000/gigatester-webserver
 sudo docker plugin install grafana/loki-docker-driver:2.9.4 --alias loki --grant-all-permissions
 
 sudo ln -s "$PWD" /usr/gigatester
-mkdir data queue reference webserver webserver/static
-cd tester
+mkdir data prog queue reference
+cd tester || (echo "Run from the root"; exit)
 python3.11 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
