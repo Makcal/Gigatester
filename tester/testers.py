@@ -45,7 +45,7 @@ class JavaTester(AbsTester):
 
         try:
             d: Container = self.docker.containers.run(
-                'openjdk:23-slim-bullseye',
+                'gigatester/java:latest',
                 detach=True, network_mode='none', working_dir='/work', stderr=True,
                 volumes=[f'{self.local("prog")}:/prog:ro',
                          f'{self.local("data")}:/data'],
@@ -113,7 +113,7 @@ class CppTester(AbsTester):
 
         try:
             d: Container = self.docker.containers.run(
-                'gcc:latest',
+                'gigatester/cpp:latest',
                 detach=True, network_mode='none', working_dir='/work', stderr=True,
                 volumes=[f'{self.local("prog")}:/prog:ro',
                          f'{self.local("data")}:/data'],
@@ -189,7 +189,7 @@ class CSharpTester(AbsTester):
 
         try:
             d: Container = self.docker.containers.run(
-                'mcr.microsoft.com/dotnet/sdk:6.0',
+                'gigatester/cs:latest',
                 detach=True, network_mode='none', working_dir='/work', stderr=True,
                 volumes=[f'{self.local("prog")}:/prog:ro',
                          f'{self.local("data")}:/data'],

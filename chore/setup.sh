@@ -19,6 +19,7 @@ echo \
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo docker plugin install grafana/loki-docker-driver:2.9.4 --alias loki --grant-all-permissions
+sudo bash chore/install_lang_images.sh
 
 sudo ln -s "$PWD" /usr/gigatester
 mkdir data prog queue reference
