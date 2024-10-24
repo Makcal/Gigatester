@@ -14,6 +14,8 @@ from generators import AbsGenerator
 from tasks import Task, TASK_DICT
 from testers import AbsTester, TESTER_DICT
 
+from typing import Any
+
 
 def generate(generator: AbsGenerator, n: int):
     try:
@@ -33,7 +35,7 @@ def generate(generator: AbsGenerator, n: int):
         fin.close()
 
 
-def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int) -> tuple[bool, dict[str, any]]:
+def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int) -> tuple[bool, dict[str, Any]]:
     different_inputs = []
     different_outputs = []
     different_expected = []
@@ -62,7 +64,7 @@ def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int)
     return True, {'code': 0, 'tests': n}
 
 
-def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, any]:
+def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, Any]:
     """
     Codes:
     -1 - internal error
@@ -112,6 +114,7 @@ def main():
                     raise Exception("Connection error")
                 print("Connected. Start scanning...", flush=True)
                 while True:
+                    time.sleep(3)
                     ws.ping()
                     queue = sorted(os.listdir('queue'))
                     if len(queue) != 0:
@@ -119,7 +122,11 @@ def main():
                         # timestamp, user id, task, language
                         tasks = '|'.join(t for t in TASK_DICT)
                         langs = '|'.join(t for t in TESTER_DICT)
-                        query_info = re.match('[0-9]+_([0-9a-f]{64})_(%s)_(%s)\\.txt' % (tasks, langs), first).groups()
+                        match_ = re.match('[0-9]+_([0-9a-f]{64})_(%s)_(%s)\\.txt' % (tasks, langs), first)
+                        if not match_:
+                            print("Trash detected:", first)
+                            continue
+                        query_info = match_.groups()
                         user_id = query_info[0]
                         task = TASK_DICT[query_info[1]]
                         tester = TESTER_DICT[query_info[2]]
@@ -147,12 +154,11 @@ def main():
                                     raise Exception("Connection error")
                         print("Done", flush=True)
 
-                    time.sleep(3)
         except ConnectionClosed as e:
             print("Connection closed", e)
         except KeyboardInterrupt:
             ws.close(reason="KeyboardInterrupt")
-            print()
+            print("Stop")
             exit()
         except Exception as e:
             print("out_error", type(e), e)
