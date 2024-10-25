@@ -28,7 +28,6 @@ function getEditorMode(language) {
 }
 
 window.addEventListener("load", () => {
-
     var editor = ace.edit("code_space");
     editor.setTheme("ace/theme/cloud9_night");
     editor.setShowPrintMargin(false);
@@ -237,7 +236,7 @@ window.addEventListener("load", () => {
             lang.classList.add("active");
             document.querySelector("#languages").value = e.target.getAttribute("data-lang");
             document.cookie = `language=${e.target.getAttribute("data-lang")}`;
-            editor.session.setMode(getEditorMode(e.target.getAttribute("data-lang").value));
+            editor.session.setMode(getEditorMode(e.target.getAttribute("data-lang")));
         });
     });
 });
