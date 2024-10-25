@@ -5,13 +5,41 @@ from abc import ABC, abstractmethod
 import os
 from os import PathLike
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Callable
 
 import docker
 import docker.errors
 from docker.models.containers import Container
 
 from exceptions import MyContainerError, MyTimeoutError
+
+
+TEST_SEPARATOR_PATTERN = "<<<ARBUZ{}ARBUZ>>>"
+
+def _parse_log_per_test(
+        log: str,
+        output: list[str],
+        n_tests: int,
+        separator_pattern: str,
+        check_function: Callable[[str], bool]
+):
+    """
+    Parses log and prepends it to output
+    """
+    p = 0
+    for i in range(n_tests):
+        separator = separator_pattern.format(i)
+        p = log.find(separator, p)
+        if p == -1:
+            break
+        p += len(separator)
+        p_next = log.find(separator_pattern.format(i+1), p)
+        if p_next == -1:
+            p_next = len(log)
+        extra = log[p:p_next].strip()
+        if check_function(extra):
+            output[i] = extra + '\n\n' + output[i]
+        p = p_next
 
 
 class AbsTester(ABC):
@@ -23,7 +51,7 @@ class AbsTester(ABC):
         return self.work_dir.joinpath(*p)
 
     @abstractmethod
-    def _test(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
+    def _test(self, n_tests: int, timeout: int) -> list[str]:
         pass
 
     def clean(self):
@@ -35,226 +63,114 @@ class AbsTester(ABC):
 
     def start(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
         self.clean()
-        return self._test(n_tests, file_name, timeout)
+        self.setup(file_name)
+        return self._test(n_tests, timeout)
 
+    @abstractmethod
+    def setup(self, file_name: PathLike[str]):
+        pass
 
-class JavaTester(AbsTester):
-    def _test(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
-        shutil.copyfile(self.local('chore', 'run_java.sh'), self.local('data', 'run_java.sh'))
-        shutil.copyfile(file_name, self.local('prog', 'Main.java'))
+    def copy_script_and_code(self, file_name: PathLike[str], script_name: str, moved_file_name: str):
+        shutil.copyfile(self.local('chore', script_name), self.local('data', script_name))
+        shutil.copyfile(file_name, self.local('prog', moved_file_name))
 
+    def run_container(self, container_name: str, command: str, timeout: int | float) -> str:
+        container: Container | None = None
         try:
-            d: Container = self.docker.containers.run(
-                'gigatester/java:latest',
+            container = self.docker.containers.run(
+                container_name,
                 detach=True, network_mode='none', working_dir='/work', stderr=True,
                 volumes=[f'{self.local("prog")}:/prog:ro',
                          f'{self.local("data")}:/data'],
-                command=f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main'
+                command=command,
             )
-            t1 = time.time()
-            while d.status != 'exited':
-                d.reload()
+
+            t_start = time.time()
+            while container.status != 'exited':
+                # refresh info
+                container.reload()
                 time.sleep(1)
-                if time.time() - t1 > timeout:
-                    d.stop(timeout=5)
+                if time.time() - t_start > timeout:
+                    container.stop(timeout=5)
                     raise MyTimeoutError()
 
-            if d.logs():
-                raise MyContainerError(d.logs().decode())
-
-            output = []
-            for i in range(n_tests):
-                try:
-                    with open(self.local('data', f'output{i}.txt')) as file:
-                        output.append(file.read().strip())
-                except FileNotFoundError:
-                    output.append("")
-
-            # I will be happy if someone explain to me why the second container does not produce output without a delay
-            # works fine on the server
-            if os.getenv('DEBUG'):
-                time.sleep(5)
-
-            return output
-
-        except docker.errors.ContainerError as e:
-            error_message = e.stderr.decode()
-            if error_message:
-                return [error_message] + ['' for _ in range(n_tests-1)]
-            else:
-                try:
-                    file = open(self.local('data', 'output0.txt'))
-                    error_message = file.read()
-                    file.close()
-                    return [error_message] + ['' for _ in range(n_tests-1)]
-                except IOError:
-                    raise MyContainerError("Unknown error.")
+            return container.logs().decode()
 
         finally:
-            if 'd' in locals():
+            if container is not None:
                 try:
-                    # noinspection PyUnboundLocalVariable
-                    d.remove()
+                    # I will be happy if someone explain to me why the second container does not produce output without a delay
+                    # works fine on the server
+                    if os.getenv('DEBUG'):
+                        time.sleep(5)
+
+                    container.remove(force=True)
                 except docker.errors.NotFound:
                     pass
+
+    def read_output(self, n_tests: int) -> list[str]:
+        output = []
+        for i in range(n_tests):
+            try:
+                with open(self.local('data', f'output{i}.txt')) as file:
+                    output.append(file.read().strip())
+            except FileNotFoundError:
+                output.append("")
+
+        return output
+
+
+class JavaTester(AbsTester):
+    def setup(self, file_name: PathLike[str]):
+        super().setup(file_name)
+        self.copy_script_and_code(file_name, 'run_java.sh', 'Main.java')
+
+    def _test(self, n_tests: int, timeout: int) -> list[str]:
+        log = self.run_container('gigatester/java:latest', f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main', timeout)
+        if log:
+            raise MyContainerError(log)
+
+        return self.read_output(n_tests)
 
 
 class CppTester(AbsTester):
     version: str
-    test_separator_pattern = "<<<ARBUZ{}ARBUZ>>>"
 
     def __init__(self, work_dir: Path, docker_engine: docker.DockerClient, /, *, version: str):
         super().__init__(work_dir, docker_engine)
         self.version = version
 
-    def _test(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
-        shutil.copyfile(self.local('chore', 'run_cpp.sh'), self.local('data', 'run_cpp.sh'))
-        shutil.copyfile(file_name, self.local('prog', 'main.cpp'))
+    def setup(self, file_name: PathLike[str]):
+        super().setup(file_name)
+        self.copy_script_and_code(file_name, 'run_cpp.sh', 'main.cpp')
 
-        try:
-            d: Container = self.docker.containers.run(
-                'gigatester/cpp:latest',
-                detach=True, network_mode='none', working_dir='/work', stderr=True,
-                volumes=[f'{self.local("prog")}:/prog:ro',
-                         f'{self.local("data")}:/data'],
-                command=f'/bin/bash /data/run_cpp.sh {n_tests} {self.version} /prog/main.cpp main'
-            )
-            t1 = time.time()
-            while d.status != 'exited':
-                d.reload()
-                time.sleep(1)
-                if time.time() - t1 > timeout:
-                    d.stop(timeout=5)
-                    raise MyTimeoutError()
+    def _test(self, n_tests: int, timeout: int) -> list[str]:
+        log = self.run_container('gigatester/cpp:latest', f'/bin/bash /data/run_cpp.sh {n_tests} {self.version} /prog/main.cpp main', timeout)
+        output = self.read_output(n_tests)
 
-            output = []
-            for i in range(n_tests):
-                try:
-                    with open(self.local('data', f'output{i}.txt')) as file:
-                        output.append(file.read().strip())
-                except FileNotFoundError:
-                    output.append("")
+        # Add segmentation faults etc. from the log
+        _parse_log_per_test(log, output, n_tests, TEST_SEPARATOR_PATTERN, lambda extra: extra)
 
-            logs: str = d.logs().decode()
-            p = 0
-            for i in range(n_tests):
-                separator = CppTester.test_separator_pattern.format(i)
-                p = logs.find(separator, p)
-                if p == -1:
-                    p = len(logs)
-                else:
-                    p += len(separator)
-                p_next = logs.find(CppTester.test_separator_pattern.format(i+1), p)
-                if p_next == -1:
-                    p_next = len(logs)
-                extra = logs[p:p_next].strip()
-                if extra:
-                    output[i] = extra + '\n\n' + output[i]
-                p = p_next
-
-            # I will be happy if someone explain to me why the second container does not produce output without a delay
-            # works fine on the server
-            if os.getenv('DEBUG'):
-                time.sleep(5)
-
-            return output
-
-        except docker.errors.ContainerError as e:
-            error_message = e.stderr.decode()
-            if error_message:
-                return [error_message] + ['' for _ in range(n_tests-1)]
-            else:
-                try:
-                    file = open(self.local('data', 'output0.txt'))
-                    error_message = file.read()
-                    file.close()
-                    return [error_message] + ['' for _ in range(n_tests-1)]
-                except IOError:
-                    raise MyContainerError("Unknown error.")
-
-        finally:
-            if 'd' in locals():
-                try:
-                    # noinspection PyUnboundLocalVariable
-                    d.remove()
-                except docker.errors.NotFound:
-                    pass
+        return output
 
 
 class CSharpTester(AbsTester):
-    def _test(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
-        shutil.copyfile(self.local('chore', 'run_cs.sh'), self.local('data', 'run_cs.sh'))
+    def setup(self, file_name: PathLike[str]):
+        super().setup(file_name)
+        self.copy_script_and_code(file_name, 'run_cs.sh', 'main.cs')
         shutil.copyfile(self.local('chore', 'cs.csproj'), self.local('data', 'cs.csproj'))
-        shutil.copyfile(file_name, self.local('prog', 'main.cs'))
 
-        try:
-            d: Container = self.docker.containers.run(
-                'gigatester/cs:latest',
-                detach=True, network_mode='none', working_dir='/work', stderr=True,
-                volumes=[f'{self.local("prog")}:/prog:ro',
-                         f'{self.local("data")}:/data'],
-                command=f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program'
-            )
-            t1 = time.time()
-            while d.status != 'exited':
-                d.reload()
-                time.sleep(1)
-                if time.time() - t1 > timeout:
-                    d.stop(timeout=5)
-                    raise MyTimeoutError()
+    def _test(self, n_tests: int, timeout: int) -> list[str]:
+        log = self.run_container('gigatester/cs:latest', f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program', timeout)
+        output = self.read_output(n_tests)
 
-            output = []
-            for i in range(n_tests):
-                try:
-                    with open(self.local('data', f'output{i}.txt')) as file:
-                        output.append(file.read().strip())
-                except FileNotFoundError:
-                    output.append("")
+        # Add errors etc. from the log
+        # Exclude 'core dumped' since dotnet prints its own error message
+        _parse_log_per_test(
+            log, output, n_tests, TEST_SEPARATOR_PATTERN, lambda extra: extra and 'core dumped' not in extra
+        )
 
-            logs: str = d.logs().decode()
-            p = 0
-            for i in range(n_tests):
-                separator = CppTester.test_separator_pattern.format(i)
-                p = logs.find(separator, p)
-                if p == -1:
-                    p = len(logs)
-                else:
-                    p += len(separator)
-                p_next = logs.find(CppTester.test_separator_pattern.format(i+1), p)
-                if p_next == -1:
-                    p_next = len(logs)
-                extra = logs[p:p_next].strip()
-                if extra and 'core dumped' not in extra:
-                    output[i] = extra + '\n\n' + output[i]
-                p = p_next
-
-            # I will be happy if someone explain to me why the second container does not produce output without a delay
-            # works fine on the server
-            if os.getenv('DEBUG'):
-                time.sleep(5)
-
-            return output
-
-        except docker.errors.ContainerError as e:
-            error_message = e.stderr.decode()
-            if error_message:
-                return [error_message] + ['' for _ in range(n_tests-1)]
-            else:
-                try:
-                    file = open(self.local('data', 'output0.txt'))
-                    error_message = file.read()
-                    file.close()
-                    return [error_message] + ['' for _ in range(n_tests-1)]
-                except IOError:
-                    raise MyContainerError("Unknown error.")
-
-        finally:
-            if 'd' in locals():
-                try:
-                    # noinspection PyUnboundLocalVariable
-                    d.remove()
-                except docker.errors.NotFound:
-                    pass
+        return output
 
 
 if os.getenv('DEBUG'):
