@@ -4,6 +4,7 @@
 cd /work
 set -e
 dotnet new console --framework "net6.0" -n main -o . > /dev/null
+rm /work/Program.cs
 cp /data/cs.csproj /work/main.csproj
 cp "$2" /work/"$3".cs
 dotnet build main.csproj --nologo -o build -v q &> /data/output0.txt

@@ -5,8 +5,8 @@
 cd /work
 cp "$3" "$4".cpp
 set -e
-CFLAGS="-O2 --std=c++$2 -o $4"
-g++ "$CFLAGS" ./"$4".cpp &> /data/output0.txt
+CFLAGS=(-O2 --std=c++"$2" -o "$4")
+g++ "${CFLAGS[@]}" ./"$4".cpp &> /data/output0.txt
 set +e
 for i in $(seq 0 $(($1-1)))
 do
