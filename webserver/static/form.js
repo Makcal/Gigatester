@@ -23,6 +23,8 @@ function getEditorMode(language) {
         case "cpp17":
         case "cpp20":
             return "ace/mode/c_cpp";
+        case "py":
+            return "ace/mode/python"
     }
     return "ace/mode/c_cpp";
 }
@@ -50,7 +52,8 @@ window.addEventListener("load", () => {
         document.querySelector("#program_contents").value = editor.getValue();
     })
 
-    if (getCookie('language') !== null && ['cpp17', 'cpp20', 'java', 'cs'].includes(getCookie('language'))) {
+    if (getCookie('language') !== null &&
+            ['cpp17', 'cpp20', 'java', 'cs', 'py'].includes(getCookie('language'))) {
         document.querySelector(`.lang[data-lang=${getCookie('language')}]`).classList.add("active");
         document.querySelector("#languages").value = getCookie('language');
         document.cookie = `language=${getCookie('language')}`;

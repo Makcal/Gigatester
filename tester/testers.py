@@ -182,6 +182,16 @@ class CSharpTester(AbsTester):
         return output
 
 
+class PythonTester(AbsTester):
+    def setup(self, file_name: PathLike[str]):
+        super().setup(file_name)
+        self.copy_script_and_code(file_name, 'run_py.sh', 'main.py')
+
+    def _test(self, n_tests: int, timeout: int) -> list[str]:
+        log = self.run_container('gigatester/py:latest', f'/bin/bash /data/run_py.sh {n_tests} /prog/main.py', timeout)
+        return self.read_output(n_tests)
+
+
 if os.getenv('DEBUG'):
     _docker_engine = docker.DockerClient(base_url='unix://home/max/.docker/desktop/docker.sock')
 else:
@@ -191,11 +201,14 @@ java_tester = JavaTester(pathlib.Path().absolute(), _docker_engine)
 cpp17_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='17')
 cpp20_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='20')
 cs_tester = CSharpTester(pathlib.Path().absolute(), _docker_engine)
-TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20', 'cs'], AbsTester] = {
+py_tester = PythonTester(pathlib.Path().absolute(), _docker_engine)
+
+TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20', 'cs', 'py'], AbsTester] = {
     'java': java_tester,
     'cpp17': cpp17_tester,
     'cpp20': cpp20_tester,
     'cs': cs_tester,
+    'py': py_tester,
 }
 
 __all__ = ['AbsTester', 'TESTER_DICT']

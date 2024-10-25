@@ -14,12 +14,13 @@ from starlette.responses import JSONResponse
 from .structures import Update, Result
 from .log import init_web
 
-LANGUAGES = Literal['java', 'cpp17', 'cpp20', 'cs']
+LANGUAGES = Literal['java', 'cpp17', 'cpp20', 'cs', 'py']
 LANGUAGE_NAMES = {
     'java': 'Java 23',
     'cpp17': 'GCC C++ 17',
     'cpp20': 'GCC C++ 20',
     'cs': 'C# 10',
+    'py': 'Python 3.13'
 }
 TASKS = Literal[
     'internal_task_id',
