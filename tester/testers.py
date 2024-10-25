@@ -99,8 +99,9 @@ class AbsTester(ABC):
         finally:
             if container is not None:
                 try:
-                    # I will be happy if someone explain to me why the second container does not produce output without a delay
-                    # works fine on the server
+                    # I will be happy if someone explain to me why the second container
+                    # does not produce output without a delay.
+                    # Works fine on the server
                     if os.getenv('DEBUG'):
                         time.sleep(5)
 
@@ -126,7 +127,9 @@ class JavaTester(AbsTester):
         self.copy_script_and_code(file_name, 'run_java.sh', 'Main.java')
 
     def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container('gigatester/java:latest', f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main', timeout)
+        log = self.run_container(
+            'gigatester/java:latest', f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main', timeout
+        )
         if log:
             raise MyContainerError(log)
 
@@ -145,7 +148,11 @@ class CppTester(AbsTester):
         self.copy_script_and_code(file_name, 'run_cpp.sh', 'main.cpp')
 
     def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container('gigatester/cpp:latest', f'/bin/bash /data/run_cpp.sh {n_tests} {self.version} /prog/main.cpp main', timeout)
+        log = self.run_container(
+            'gigatester/cpp:latest',
+            f'/bin/bash /data/run_cpp.sh {n_tests} {self.version} /prog/main.cpp',
+            timeout
+        )
         output = self.read_output(n_tests)
 
         # Add segmentation faults etc. from the log
@@ -161,7 +168,9 @@ class CSharpTester(AbsTester):
         shutil.copyfile(self.local('chore', 'cs.csproj'), self.local('data', 'cs.csproj'))
 
     def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container('gigatester/cs:latest', f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program', timeout)
+        log = self.run_container(
+            'gigatester/cs:latest', f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program', timeout
+        )
         output = self.read_output(n_tests)
 
         # Add errors etc. from the log
