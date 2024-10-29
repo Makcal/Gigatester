@@ -1,11 +1,13 @@
-import pathlib
-import shutil
-import time
 from abc import ABC, abstractmethod
+from multiprocessing.synchronize import Event
+from multiprocessing.connection import Connection
 import os
 from os import PathLike
+import pathlib
 from pathlib import Path
-from typing import Literal, Callable
+import shutil
+import time
+from typing import Callable, Literal
 
 import docker
 import docker.errors
@@ -50,12 +52,8 @@ class AbsTester(ABC):
     def local(self, *p: str) -> Path:
         return self.work_dir.joinpath(*p)
 
-    @abstractmethod
-    def _test(self, n_tests: int, timeout: int) -> list[str]:
-        pass
-
     def clean(self):
-        shutil.rmtree(self.local('prog'))
+        shutil.rmtree(self.local('prog'), ignore_errors=True)
         self.local('prog').mkdir()
         for i in os.listdir(self.local('data')):
             if i.startswith('output'):
@@ -64,27 +62,77 @@ class AbsTester(ABC):
     def start(self, n_tests: int, file_name: PathLike[str], timeout: int) -> list[str]:
         self.clean()
         self.setup(file_name)
-        return self._test(n_tests, timeout)
+
+        log = self.run_container_for_tests(n_tests, timeout)
+        return self.process_log(self.read_output(n_tests), log)
+
+    def start_interactive(
+            self,
+            n_tests: int,
+            timeout: int,
+            file_name: PathLike[str],
+            stop: Event,
+            log_pipe: Connection | None = None,
+    ) -> str:
+        self.clean()
+        self.setup_interactive(file_name)
+
+        container: Container | None = None
+        try:
+            container = self.start_interactive_container(n_tests)
+            stop.wait(timeout)
+            time.sleep(0.1)
+            container.reload()
+            if container.status != 'exited':
+                raise MyTimeoutError()
+
+            log = container.logs().decode()
+            if log_pipe is not None:
+                log_pipe.send(log)
+                log_pipe.close()
+            return log
+        finally:
+            if container is not None:
+                container.remove(force=True)
 
     @abstractmethod
     def setup(self, file_name: PathLike[str]):
         pass
 
+    @abstractmethod
+    def run_container_for_tests(self, n_tests: int, timeout: int | float) -> str:
+        pass
+
+    @abstractmethod
+    def setup_interactive(self, file_name: PathLike[str]):
+        pass
+
+    @abstractmethod
+    def start_interactive_container(self, n_tests: int) -> Container:
+        pass
+
+    def process_log(self, outputs: list[str], log: str) -> list[str]:
+        if log:
+            raise MyContainerError(log)
+        return outputs
+
     def copy_script_and_code(self, file_name: PathLike[str], script_name: str, moved_file_name: str):
         shutil.copyfile(self.local('chore', script_name), self.local('data', script_name))
         shutil.copyfile(file_name, self.local('prog', moved_file_name))
 
+    def start_container(self, container_name: str, command: str) -> Container:
+        return self.docker.containers.run(
+            container_name,
+            detach=True, network_mode='none', working_dir='/work', stderr=True,
+            volumes=[f'{self.local("prog")}:/prog:ro',
+                     f'{self.local("data")}:/data'],
+            command=command,
+        )
+
     def run_container(self, container_name: str, command: str, timeout: int | float) -> str:
         container: Container | None = None
         try:
-            container = self.docker.containers.run(
-                container_name,
-                detach=True, network_mode='none', working_dir='/work', stderr=True,
-                volumes=[f'{self.local("prog")}:/prog:ro',
-                         f'{self.local("data")}:/data'],
-                command=command,
-            )
-
+            container = self.start_container(container_name, command)
             t_start = time.time()
             while container.status != 'exited':
                 # refresh info
@@ -117,23 +165,28 @@ class AbsTester(ABC):
                     output.append(file.read().strip())
             except FileNotFoundError:
                 output.append("")
-
         return output
 
 
 class JavaTester(AbsTester):
     def setup(self, file_name: PathLike[str]):
-        super().setup(file_name)
         self.copy_script_and_code(file_name, 'run_java.sh', 'Main.java')
 
-    def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container(
-            'gigatester/java:latest', f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main', timeout
+    def run_container_for_tests(self, n_tests: int, timeout: int | float) -> str:
+        return self.run_container(
+            'gigatester/java:latest',
+            f'/bin/bash /data/run_java.sh {n_tests} /prog/Main.java Main',
+            timeout,
         )
-        if log:
-            raise MyContainerError(log)
 
-        return self.read_output(n_tests)
+    def setup_interactive(self, file_name: PathLike[str]):
+        self.copy_script_and_code(file_name, 'run_java_int.sh', 'Main.java')
+
+    def start_interactive_container(self, n_tests: int) -> Container:
+        return self.start_container(
+            "gigatester/java:latest",
+            f'/bin/bash /data/run_java_int.sh {n_tests} /prog/Main.java Main',
+        )
 
 
 class CppTester(AbsTester):
@@ -144,52 +197,84 @@ class CppTester(AbsTester):
         self.version = version
 
     def setup(self, file_name: PathLike[str]):
-        super().setup(file_name)
         self.copy_script_and_code(file_name, 'run_cpp.sh', 'main.cpp')
 
-    def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container(
+    def run_container_for_tests(self, n_tests: int, timeout: int | float) -> str:
+        return self.run_container(
             'gigatester/cpp:latest',
             f'/bin/bash /data/run_cpp.sh {n_tests} {self.version} /prog/main.cpp',
-            timeout
+            timeout,
         )
-        output = self.read_output(n_tests)
 
+    def process_log(self, outputs: list[str], log: str) -> list[str]:
         # Add segmentation faults etc. from the log
-        _parse_log_per_test(log, output, n_tests, TEST_SEPARATOR_PATTERN, lambda extra: extra)
+        _parse_log_per_test(log, outputs, len(outputs), TEST_SEPARATOR_PATTERN, lambda extra: bool(extra))
+        return outputs
 
-        return output
+    def setup_interactive(self, file_name: PathLike[str]):
+        self.copy_script_and_code(file_name, 'run_cpp_int.sh', 'main.cpp')
+
+    def start_interactive_container(self, n_tests: int) -> Container:
+        return self.start_container(
+            "gigatester/cpp:latest",
+            f'/bin/bash /data/run_cpp_int.sh {n_tests} {self.version} /prog/main.cpp',
+        )
 
 
 class CSharpTester(AbsTester):
     def setup(self, file_name: PathLike[str]):
-        super().setup(file_name)
         self.copy_script_and_code(file_name, 'run_cs.sh', 'main.cs')
         shutil.copyfile(self.local('chore', 'cs.csproj'), self.local('data', 'cs.csproj'))
 
-    def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container(
-            'gigatester/cs:latest', f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program', timeout
+    def run_container_for_tests(self, n_tests: int, timeout: int | float) -> str:
+        return self.run_container(
+            'gigatester/cs:latest',
+            f'/bin/bash /data/run_cs.sh {n_tests} /prog/main.cs Program',
+            timeout,
         )
-        output = self.read_output(n_tests)
 
+    def process_log(self, outputs: list[str], log: str) -> list[str]:
         # Add errors etc. from the log
         # Exclude 'core dumped' since dotnet prints its own error message
         _parse_log_per_test(
-            log, output, n_tests, TEST_SEPARATOR_PATTERN, lambda extra: extra and 'core dumped' not in extra
+            log,
+            outputs,
+            len(outputs),
+            TEST_SEPARATOR_PATTERN,
+            lambda extra: bool(extra) and 'core dumped' not in extra,
         )
+        return outputs
 
-        return output
+    def setup_interactive(self, file_name: PathLike[str]):
+        self.copy_script_and_code(file_name, 'run_cs_int.sh', 'main.cs')
+        shutil.copyfile(self.local('chore', 'cs.csproj'), self.local('data', 'cs.csproj'))
+
+    def start_interactive_container(self, n_tests: int) -> Container:
+        return self.start_container(
+            "gigatester/cs:latest",
+            f'/bin/bash /data/run_cs_int.sh {n_tests} /prog/main.cs Program',
+        )
 
 
 class PythonTester(AbsTester):
     def setup(self, file_name: PathLike[str]):
-        super().setup(file_name)
         self.copy_script_and_code(file_name, 'run_py.sh', 'main.py')
 
-    def _test(self, n_tests: int, timeout: int) -> list[str]:
-        log = self.run_container('gigatester/py:latest', f'/bin/bash /data/run_py.sh {n_tests} /prog/main.py', timeout)
-        return self.read_output(n_tests)
+    def run_container_for_tests(self, n_tests: int, timeout: int | float) -> str:
+        return self.run_container(
+            'gigatester/py:latest',
+            f'/bin/bash /data/run_py.sh {n_tests} /prog/main.py',
+            timeout,
+        )
+
+    def setup_interactive(self, file_name: PathLike[str]):
+        self.copy_script_and_code(file_name, 'run_py_int.sh', 'main.py')
+
+    def start_interactive_container(self, n_tests: int) -> Container:
+        return self.start_container(
+            "gigatester/py:latest",
+            f'/bin/bash /data/run_py_int.sh {n_tests} /prog/main.py',
+        )
 
 
 if os.getenv('DEBUG'):
@@ -197,11 +282,12 @@ if os.getenv('DEBUG'):
 else:
     _docker_engine = docker.DockerClient()
 
-java_tester = JavaTester(pathlib.Path().absolute(), _docker_engine)
-cpp17_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='17')
-cpp20_tester = CppTester(pathlib.Path().absolute(), _docker_engine, version='20')
-cs_tester = CSharpTester(pathlib.Path().absolute(), _docker_engine)
-py_tester = PythonTester(pathlib.Path().absolute(), _docker_engine)
+work_dir = pathlib.Path().absolute()
+java_tester = JavaTester(work_dir, _docker_engine)
+cpp17_tester = CppTester(work_dir, _docker_engine, version='17')
+cpp20_tester = CppTester(work_dir, _docker_engine, version='20')
+cs_tester = CSharpTester(work_dir, _docker_engine)
+py_tester = PythonTester(work_dir, _docker_engine)
 
 TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20', 'cs', 'py'], AbsTester] = {
     'java': java_tester,

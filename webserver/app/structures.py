@@ -16,3 +16,5 @@ class Result(pydantic.BaseModel):
     output: list[str] | None = None
     language: str | None = None
     task: str | None = None
+    interactive: bool | None = None
+

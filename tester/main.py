@@ -1,33 +1,35 @@
+import ctypes
 import json
+from multiprocessing import Event, Manager, Pipe, Process
+from multiprocessing.managers import ValueProxy
 import os
 import pathlib
 import re
+import select
 import shutil
 import time
+from typing import Any, Callable
 
 from websockets import ConnectionClosed
 from websockets.sync.client import connect
 
-from checkers import AbsChecker
 from exceptions import MyContainerError, MyTimeoutError
-from generators import AbsGenerator
-from tasks import Task, TASK_DICT
+from interactive_task import (
+    AbsCommunicator,
+    AbsInteractor,
+    InteractiveTask,
+    LoggingCommunicatorDecorator,
+    NamedPipeCommunicator,
+)
+from results import *
+from simple_task import AbsChecker, AbsGenerator, SimpleTask
+from tasks.task_dict import TASK_DICT
 from testers import AbsTester, TESTER_DICT
 
-from typing import Any
 
-
-def generate(generator: AbsGenerator, n: int):
-    try:
-        shutil.rmtree(pathlib.Path().absolute().joinpath('data'))
-    except FileNotFoundError:
-        pass
-    try:
-        shutil.rmtree(pathlib.Path().absolute().joinpath('prog'))
-    except FileNotFoundError:
-        pass
-    pathlib.Path().absolute().joinpath('data').mkdir()
-    pathlib.Path().absolute().joinpath('prog').mkdir()
+def generate_input(generator: AbsGenerator, n: int):
+    shutil.rmtree('data', ignore_errors=True)
+    os.mkdir('data')
     for i in range(n):
         fin = open(f'data/input{i}.txt', 'w')
         test = generator.generate()
@@ -35,7 +37,7 @@ def generate(generator: AbsGenerator, n: int):
         fin.close()
 
 
-def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int) -> tuple[bool, dict[str, Any]]:
+def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int) -> TesterResult:
     different_inputs = []
     different_outputs = []
     different_expected = []
@@ -57,14 +59,220 @@ def compare(checker: AbsChecker, output: list[str], expected: list[str], n: int)
             different_outputs.append(test_output)
             different_expected.append(test_expected)
     if different:
-        return False, {'code': 1,
-                       'input': different_inputs,
-                       'expected': different_expected,
-                       'output': different_outputs, 'tests': n}
-    return True, {'code': 0, 'tests': n}
+        return Difference(n, different_inputs, different_expected, different_outputs)
+    return Success(n)
 
 
-def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, Any]:
+def test_simple(task: SimpleTask, tester: AbsTester, file: str) -> TesterResult:
+    # try 1 test
+    generate_input(task.generator, 1)
+    try:
+        first_expected = task.default_tester.start(1, task.reference_file, 20)
+        first_output = tester.start(1, pathlib.Path('queue') / file, 20)
+    except MyTimeoutError:
+        with open(f'data/input0.txt') as fin:
+            test = fin.read()
+        return Timeout(1, [test])
+    if not isinstance(first_res := compare(task.checker, first_output, first_expected, 1), Success):
+        return first_res
+
+    # try the full set of tests if the first was successfull
+    generate_input(task.generator, task.n_tests)
+    expected = task.default_tester.start(task.n_tests, task.reference_file, task.timeout)
+    output = tester.start(
+        task.n_tests,
+        pathlib.Path('queue') / file,
+        task.timeout,
+    )
+
+    return compare(task.checker, output, expected, task.n_tests)
+
+
+def interactor_process(
+        log: ValueProxy[str],
+        success: ValueProxy[bool],
+        communicator: AbsCommunicator,
+        interactor_factory: Callable[[AbsCommunicator], AbsInteractor],
+        environment: Any,
+):
+    class SharingCommunicatorDecorator(LoggingCommunicatorDecorator):
+        def append_log(self, s: str):
+            super().append_log(s)
+            log.value = self.get_log()
+
+    interactor = interactor_factory(SharingCommunicatorDecorator(communicator))
+    try:
+        success.value = interactor.run(environment)
+    except Exception:
+        pass
+
+
+def timeout_read(source: str, timeout: float) -> str | None:
+    fd = os.open(source, os.O_NONBLOCK)
+    poll = select.poll()
+    poll.register(fd)
+    poll_result = poll.poll(timeout * 1000)
+    if poll_result and poll_result[0][1] & select.POLLIN != 0:
+        msg = os.read(fd, 1024).decode()
+        os.close(fd)
+        return msg
+    os.close(fd)
+    return None
+
+
+def run_interactive_program(
+        n_tests: int,
+        environments: list[Any],
+        one_timeout: int,
+        task: InteractiveTask,
+        tester: AbsTester,
+        file: os.PathLike
+) -> list[tuple[bool, str]]:
+    shutil.rmtree('data', ignore_errors=True)
+    os.mkdir('data')
+    prev_umask = os.umask(0)
+    os.mkfifo('data/to_cont')
+    os.mkfifo('data/to_py')
+    os.umask(prev_umask)
+    interactor_communicator = NamedPipeCommunicator()
+    interactor_communicator.setup()
+
+    stop_container = Event()
+    log_pipe_read, log_pipe_write = Pipe(duplex=False)
+    start_timeout = 15 if tester is not TESTER_DICT['cs'] else 25
+    container_manager = Process(
+        target=tester.start_interactive,
+        args=(
+            n_tests,
+            start_timeout + one_timeout * 2 * n_tests,
+            file,
+            stop_container,
+            log_pipe_write,
+        ),
+    )
+    container_manager.start()
+    try:
+        container_message = timeout_read('data/to_py', start_timeout)
+        if container_message is None:
+            raise RuntimeError('Container has not started')
+        container_message = container_message.strip()
+        if container_message == "CompilationError":
+            stop_container.set()
+            if log_pipe_read.poll(5):
+                return [(False, log_pipe_read.recv())] * n_tests
+            raise MyContainerError("")
+        elif container_message != "Start":
+            raise MyContainerError(container_message)
+
+        results = []
+        for i in range(len(environments)):
+            with open('data/to_cont', 'w') as p:
+                p.write('next\n')
+            with Manager() as manager:
+                log = manager.Value(ctypes.c_wchar_p, "")
+                success = manager.Value(ctypes.c_bool, False)
+                interactor = Process(
+                    target=interactor_process,
+                    args=(
+                        log,
+                        success,
+                        interactor_communicator,
+                        task.interactor_factory,
+                        environments[i],
+                    ),
+                )
+                interactor.start()
+                interactor.join(one_timeout)
+
+                if interactor.exitcode is None:
+                    interactor.terminate()
+                    interactor.join()
+                    results.append((False, log.value + "\nTimeout..."))
+                else:
+                    results.append((success.value, log.value))
+                with open('data/to_cont', 'w') as p:
+                    p.write('stop')
+
+        return results
+
+    finally:
+        stop_container.set()
+        container_manager.join()
+
+
+def test_interactive(task: InteractiveTask, tester: AbsTester, file: str) -> TesterResult:
+    file_path = pathlib.Path('queue') / file
+
+    # try 1 test
+    environment = task.env_generator.generate()
+    try:
+        result = run_interactive_program(
+            1,
+            [environment],
+            task.one_timeout,
+            task,
+            tester,
+            file_path
+        )[0]
+        if not result[0]:
+            correct_example = run_interactive_program(
+                1,
+                [environment],
+                task.one_timeout,
+                task,
+                task.default_tester,
+                task.reference_file
+            )[0]
+            if not correct_example[0]:
+                print("Reference program {task.reference_file} failed")
+            return Difference(
+                1,
+                [task.env_to_string(environment) or ""],
+                [correct_example[1]],
+                [result[1]],
+                interactive=True,
+            )
+    except MyTimeoutError:
+        env_text = task.env_to_string(environment)
+        return Timeout(1, [env_text] if env_text is not None else None)
+
+    # run the full set of tests
+    environments = [task.env_generator.generate() for _ in range(task.n_tests)]
+    result = run_interactive_program(
+        task.n_tests,
+        environments,
+        task.one_timeout,
+        task,
+        tester,
+        file_path
+    )
+    errored_results: list[tuple[Any, str]] = []
+    for i in range(task.n_tests):
+        if not result[i][0]:
+            errored_results.append((environments[i], result[i][1]))
+    if not errored_results:
+        return Success(task.n_tests)
+
+    correct = run_interactive_program(
+        len(errored_results),
+        [er[0] for er in errored_results],
+        task.one_timeout,
+        task,
+        task.default_tester,
+        task.reference_file,
+    )
+    if not all(map(lambda r: r[0], correct)):
+        print("Reference program {task.reference_file} failed")
+    return Difference(
+        task.n_tests,
+        [task.env_to_string(er[0]) or "" for er in errored_results],
+        [r[1] for r in correct],
+        [er[1] for er in errored_results],
+        interactive=True,
+    )
+
+
+def do_test(tester: AbsTester, task: SimpleTask | InteractiveTask, file: str) -> TesterResult:
     """
     Codes:
     -1 - internal error
@@ -73,39 +281,26 @@ def do_test(file: str, tester: AbsTester, task: Task) -> dict[str, Any]:
     2 - timeout error
     """
     try:
-        try:
-            generate(task.generator, 1)
-            try:
-                first_expected = task.default_tester.start(1, task.reference_file, 20)
-                first_output = tester.start(1, pathlib.Path().absolute().joinpath('queue', file), 20)
-            except MyTimeoutError:
-                with open(f'data/input0.txt') as fin:
-                    test = fin.read()
-                return {'code': 2, 'tests': 1, 'input': [test]}
-            first_res = compare(task.checker, first_output, first_expected, 1)
-            if not first_res[0]:
-                return first_res[1]
-
-            generate(task.generator, task.n_tests)
-            expected = task.default_tester.start(task.n_tests, task.reference_file, task.timeout)
-            output = tester.start(task.n_tests, pathlib.Path().absolute().joinpath('queue', file), task.timeout)
-        except MyContainerError as e:
-            print("ContainerError", e)
-            return {'code': -1, 'error': e.message}
-        except MyTimeoutError:
-            return {'code': 2}
-
-        return compare(task.checker, output, expected, task.n_tests)[1]
-
+        match task:
+            case SimpleTask():
+                return test_simple(task, tester, file)
+            case InteractiveTask():
+                return test_interactive(task, tester, file)
+    except MyContainerError as e:
+        print("ContainerError", e)
+        return Error(e.message)
+    except MyTimeoutError:
+        return Timeout(task.n_tests)
     except Exception as e:
         print("Critical error", type(e), e)
-        return {'code': -1, 'error': "Critical error"}
+        return Error("Critical error")
 
 
 SECRET = 'eb8d5498f143d53df55ce37fb3d944a3076f757b1268bfb4ce54959f3c2b5c1d'
 
 
 def main():
+    ws = None
     while True:
         try:
             with connect("ws://0.0.0.0:80/ws") as ws:
@@ -114,7 +309,6 @@ def main():
                     raise Exception("Connection error")
                 print("Connected. Start scanning...", flush=True)
                 while True:
-                    time.sleep(3)
                     ws.ping()
                     queue = sorted(os.listdir('queue'))
                     if len(queue) != 0:
@@ -129,11 +323,11 @@ def main():
                         query_info = match_.groups()
                         user_id = query_info[0]
                         task = TASK_DICT[query_info[1]]
-                        tester = TESTER_DICT[query_info[2]]
+                        tester = TESTER_DICT[query_info[2]] # type: ignore
 
                         time_start = time.time()
                         print(f"Do {query_info[1]} on {query_info[2]} for {user_id}", flush=True)
-                        resp = do_test(first, tester, task)
+                        resp = do_test(tester, task, first).to_dict()
 
                         resp['task'] = query_info[1]
                         resp['language'] = query_info[2]
@@ -153,11 +347,13 @@ def main():
                                 if ws.recv(3) != 'ok':
                                     raise Exception("Connection error")
                         print("Done", flush=True)
+                    time.sleep(1)
 
         except ConnectionClosed as e:
             print("Connection closed", e)
         except KeyboardInterrupt:
-            ws.close(reason="KeyboardInterrupt")
+            if ws is not None:
+                ws.close(reason="KeyboardInterrupt")
             print("Stop")
             exit()
         except Exception as e:

@@ -23,10 +23,12 @@ LANGUAGE_NAMES = {
     'py': 'Python 3.13'
 }
 TASKS = Literal[
-    'internal_task_id',
+    'example',
+    'example_int',
 ]
 TASK_NAMES = {
-    'internal_task_id': 'Visual Task Name',
+    'example': 'Example',
+    'example_int': 'Example interactive',
 }
 
 VERSION_ID = "2"

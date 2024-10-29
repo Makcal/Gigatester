@@ -152,25 +152,33 @@ window.addEventListener("load", () => {
                                     input = json['input'][i];
                                     output = json['output'][i];
                                     expected = json['expected'][i];
+                                    let interactive = json['interactive'];
 
                                     input = input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                                     output = output.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                                     expected = expected.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+                                    let [inputHeader, expectedHeader, outputHeader] = !interactive
+                                        ? [
+                                            'Input', 'Correct output', 'Your output',
+                                        ] : [
+                                            'Start data', 'Correct interaction', 'Your interaction',
+                                        ];
+
                                     document.querySelector(".data").insertAdjacentHTML("beforeend", `
                                 <span class="line">
                                     <span class="text_block">
-                                        Input:
+                                        ${inputHeader}:
                                         <br>
                                         <textarea class="input code">${input}</textarea>
                                     </span>
                                     <span class="text_block">
-                                        Expected output:
+                                        ${expectedHeader}:
                                         <br>
                                         <textarea class="expected code">${expected}</textarea>
                                     </span>
                                     <span class="text_block">
-                                        Your output:
+                                        ${outputHeader}:
                                         <br>
                                         <textarea class="output code">${output}</textarea>
                                     </span>
