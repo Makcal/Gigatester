@@ -162,7 +162,6 @@ window.addEventListener("load", () => {
                                 elem.classList.add('fadein');
                                 setTimeout(
                                     () => {
-                                        elem.style.opacity = '1';
                                         elem.classList.remove('fadein');
                                     },
                                     300
@@ -232,7 +231,6 @@ window.addEventListener("load", () => {
                                 let failure = document.querySelector(".failure-watermelon");
                                 failure.style.animationPlayState = "running";
                             } else if (json.code === 0) {
-                                document.querySelector('.result').style.removeProperty('opacity')
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}`;
                                 document.body.classList.add("watermelon-rain");
