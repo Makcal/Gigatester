@@ -2,7 +2,7 @@ from random import randint
 from typing import Any
 
 from simple_task import AbsGenerator, SimpleTask
-from interactive_task import AbsEnvironmentGenerator, AbsLoggingInterractor, AbsEnvironmentPresenter, InteractiveTask
+from interactive_task import AbsEnvironmentGenerator, AbsLoggingInteractor, AbsEnvironmentPresenter, InteractiveTask
 from simple_task import ComparisonChecker
 from testers import TESTER_DICT
 
@@ -29,7 +29,7 @@ class ExampleEnvPresenter(AbsEnvironmentPresenter):
         return f"{env} was generated\n"
 
 
-class ExampleInteractor(AbsLoggingInterractor):
+class ExampleInteractor(AbsLoggingInteractor):
     def run_test(self, env: Any) -> bool:
         communicator = self.communicator
         n = int(communicator.receive_line())

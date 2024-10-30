@@ -2,7 +2,7 @@ __all__ = [
     "AbsCommunicator",
     "NamedPipeCommunicator",
     "AbsInteractor",
-    "AbsLoggingInterractor",
+    "AbsLoggingInteractor",
     "LoggingCommunicatorDecorator"
 ]
 
@@ -67,7 +67,7 @@ class NamedPipeCommunicator(AbsCommunicator):
         self.pipe[1].close()
         self.pipe = None
 
-    # analoge of `input()` - the only high-level way to handle input in Python (no scanners)
+    # analogue of `input()` - the only high-level way to handle input in Python (no scanners)
     def receive_line(self, keep_newline: bool = False) -> str:
         if self.pipe is None:
             raise RuntimeError("Start session first")
@@ -135,7 +135,7 @@ class AbsInteractor(ABC):
         pass
 
 
-class AbsLoggingInterractor(AbsInteractor):
+class AbsLoggingInteractor(AbsInteractor):
     def __init__(self, communicator: AbsCommunicator):
         logger = LoggingCommunicatorDecorator(communicator)
         super().__init__(logger)

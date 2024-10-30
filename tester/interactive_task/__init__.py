@@ -1,7 +1,7 @@
 from .abs_interactor import (
     AbsInteractor,
     AbsCommunicator,
-    AbsLoggingInterractor,
+    AbsLoggingInteractor,
     LoggingCommunicatorDecorator,
     NamedPipeCommunicator,
 )
