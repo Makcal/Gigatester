@@ -2,34 +2,23 @@ import os
 import random
 import time
 from collections import defaultdict
-from typing import Annotated, Literal
+from typing import Annotated
 
 import uvicorn
-from fastapi import *
+from fastapi import FastAPI, Request, status, Form, Cookie, BackgroundTasks, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse
 
-from .structures import Update, Result
+from .structures import Update, Result, Config
 from .log import init_web
 
-LANGUAGES = Literal['java', 'cpp17', 'cpp20', 'cs', 'py']
-LANGUAGE_NAMES = {
-    'java': 'Java 23',
-    'cpp17': 'GCC C++ 17',
-    'cpp20': 'GCC C++ 20',
-    'cs': 'C# 10',
-    'py': 'Python 3.13'
-}
-TASKS = Literal[
-    'example',
-    'example_int',
-]
-TASK_NAMES = {
-    'example': 'Example',
-    'example_int': 'Example interactive',
-}
+with open('config.json') as f:
+    config = Config.model_validate_json(f.read())
+
+LANGUAGES = {lang.id: lang for lang in config.languages}
+TASKS = {t.id: t for t in config.tasks}
 
 VERSION_ID = "2"
 
@@ -56,7 +45,7 @@ MAX_REG = int(os.environ['MAX_REG'])
 app.mount('/static', StaticFiles(directory="static"), name="static")
 
 
-def send_program(program_text: str, user: str, language: LANGUAGES, task: TASKS):
+def send_program(program_text: str, user: str, language: str, task: str):
     timestamp = int(time.time())
     f = open(f'/queue/{timestamp}_{user}_{task}_{language}.txt', 'w')
     f.write(program_text)
@@ -65,7 +54,7 @@ def send_program(program_text: str, user: str, language: LANGUAGES, task: TASKS)
 
 @app.middleware("http")
 async def show_ip(request: Request, call_next):
-    print(request.client.host)
+    print(request.client.host if request.client is not None else 'No ip')
     return await call_next(request)
 
 
@@ -74,7 +63,7 @@ async def reg(request: Request, call_next):
     if request.url.path.startswith('/static/form.html'):
         return await call_next(request)
 
-    if request.client.host in ban_list:
+    if request.client and request.client.host in ban_list:
         return RedirectResponse(f"/static/form.html", status.HTTP_302_FOUND)
 
     user_id = request.cookies.get('user_id')
@@ -105,17 +94,21 @@ API
 
 @app.get('/task_list')
 async def get_task_list():
-    return [(id_, name) for id_, name in TASK_NAMES.items()]
+    return [(task.id, task.name) for task in TASKS.values()]
 
 
 @app.post('/submit')
 async def form(background_tasks: BackgroundTasks,
-               language: Annotated[LANGUAGES, Form()],
-               task: Annotated[TASKS, Form()],
-               program: Annotated[str, Form()] = None,
-               user_id: Annotated[str, Cookie()] = None):
+               language: Annotated[str, Form()],
+               task: Annotated[str, Form()],
+               program: Annotated[str | None, Form()] = None,
+               user_id: Annotated[str | None, Cookie()] = None):
     if program is None or program == "":
         raise HTTPException(400, "No input")
+    if language not in LANGUAGES or task not in TASKS:
+        raise HTTPException(400, "")
+    if user_id is None:
+        raise HTTPException(401, "Get a user_id cookie first")
 
     response = JSONResponse({'user_id': user_id})
     response.set_cookie('task', task)
@@ -129,7 +122,7 @@ async def form(background_tasks: BackgroundTasks,
 
 
 @app.get('/update', response_model_exclude_defaults=True)
-def update(user_id: Annotated[str, Cookie()] = None):
+def update(user_id: Annotated[str | None, Cookie()] = None):
     if user_id is None:
         raise HTTPException(400)
     if user_id in queue:
@@ -141,7 +134,7 @@ def update(user_id: Annotated[str, Cookie()] = None):
 
 
 @app.get('/result', response_model_exclude_defaults=True)
-def result(user_id: Annotated[str, Cookie()] = None):
+def result(user_id: Annotated[str | None, Cookie()] = None):
     if user_id is None:
         raise HTTPException(400)
     if user_id in results:
@@ -164,8 +157,8 @@ async def internal(ws: WebSocket):
             user_id = data['user_id']
             if user_id in queue:
                 queue.remove(user_id)
-                data['task'] = TASK_NAMES[data['task']]
-                data['language'] = LANGUAGE_NAMES[data['language']]
+                data['task'] = TASKS[data['task']].name
+                data['language'] = LANGUAGES[data['language']].name
                 results[user_id] = Result(**data)
     except WebSocketDisconnect as e:
         print(e)

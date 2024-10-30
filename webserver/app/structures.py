@@ -1,12 +1,27 @@
-import pydantic
+from pydantic import BaseModel
 
 
-class Update(pydantic.BaseModel):
+class Language(BaseModel):
+    id: str
+    name: str
+
+
+class Task(BaseModel):
+    id: str
+    name: str
+
+
+class Config(BaseModel):
+    languages: list[Language]
+    tasks: list[Task]
+
+
+class Update(BaseModel):
     code: int
     position: int | None = None
 
 
-class Result(pydantic.BaseModel):
+class Result(BaseModel):
     code: int
     error: str | None = None
     time: float | None = None
