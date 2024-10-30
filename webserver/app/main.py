@@ -148,6 +148,16 @@ def result(user_id: Annotated[str | None, Cookie()] = None):
     raise HTTPException(400)
 
 
+"""
+Internal
+"""
+
+
+@app.get("/queue_size", response_class=PlainTextResponse)
+async def get_queue_size():
+    return str(len(queue))
+
+
 @app.post("/ws_hello", response_class=PlainTextResponse)
 async def ws_hello(token: Annotated[str, Body(embed=True)]) -> str:
     if token != SECRET:
