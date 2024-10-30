@@ -20,7 +20,7 @@ with open('config.json') as f:
 LANGUAGES = {lang.id: lang for lang in config.languages}
 TASKS = {t.id: t for t in config.tasks}
 
-VERSION_ID = "2"
+VERSION_ID = "3"
 
 app = FastAPI()
 app.add_middleware(
