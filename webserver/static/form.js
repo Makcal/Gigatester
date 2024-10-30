@@ -29,6 +29,37 @@ function getEditorMode(language) {
     return "ace/mode/c_cpp";
 }
 
+async function loadTasks() {
+    let tasks = JSON.parse(localStorage.getItem('tasks') || "[]");
+    let elem = document.querySelector('#tasks');
+    tasks.forEach(task => {
+        let [id, name] = task;
+        elem.insertAdjacentHTML(
+            "beforeend",
+            `<option value="${id}">${name}</option>`
+        );
+    });
+    await fetch("/task_list")
+        .then(r => r.json())
+        .then(async t => {
+            elem.textContent = '';
+            t.forEach(task => {
+                let [id, name] = task;
+                elem.insertAdjacentHTML(
+                    "beforeend",
+                    `<option value="${id}">${name}</option>`
+                );
+            });
+            if (getCookie('task') !== null)
+                document.querySelector("#tasks").value = getCookie('task');
+            localStorage.setItem('tasks', JSON.stringify(t));
+        });
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+    await loadTasks();
+});
+
 window.addEventListener("load", () => {
     var editor = ace.edit("code_space");
     editor.setTheme("ace/theme/cloud9_night");
@@ -122,7 +153,9 @@ window.addEventListener("load", () => {
                             };
 
                             document.querySelector("#verdict").innerText = verdicts[json['code']];
-                            document.querySelector("#verdict").classList.add(verdicts[json['code']].toLowerCase().replace(/ /g, "-"));
+                            document.querySelector("#verdict").classList.add(
+                                verdicts[json['code']].toLowerCase().replace(/ /g, "-")
+                            );
 
                             function fadein_result() {
                                 let elem = document.querySelector(".result");

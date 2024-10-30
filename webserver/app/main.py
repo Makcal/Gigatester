@@ -103,6 +103,11 @@ API
 """
 
 
+@app.get('/task_list')
+async def get_task_list():
+    return [(id_, name) for id_, name in TASK_NAMES.items()]
+
+
 @app.post('/submit')
 async def form(background_tasks: BackgroundTasks,
                language: Annotated[LANGUAGES, Form()],
