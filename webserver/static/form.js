@@ -50,8 +50,7 @@ async function loadTasks() {
                     `<option value="${id}">${name}</option>`
                 );
             });
-            if (getCookie('task') !== null)
-                document.querySelector("#tasks").value = getCookie('task');
+            document.querySelector("#tasks").value = getCookie('task') !== null ? getCookie('task') : t[0][0];
             localStorage.setItem('tasks', JSON.stringify(t));
         });
 }
