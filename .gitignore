@@ -164,3 +164,9 @@ data/*
 prog/*
 reference/*
 webserver/config.json
+tester/tasks/*
+!tester/tasks/__init__.py
+!tester/tasks/example.py
+!tester/tasks/task_base.py
+!tester/tasks/task_dict_example.py
+
