@@ -166,22 +166,13 @@ window.addEventListener("load", () => {
                                         ];
 
                                     document.querySelector(".data").insertAdjacentHTML("beforeend", `
-                                <span class="line">
-                                    <span class="text_block">
-                                        ${inputHeader}:
-                                        <br>
-                                        <textarea class="input code">${input}</textarea>
-                                    </span>
-                                    <span class="text_block">
-                                        ${expectedHeader}:
-                                        <br>
-                                        <textarea class="expected code">${expected}</textarea>
-                                    </span>
-                                    <span class="text_block">
-                                        ${outputHeader}:
-                                        <br>
-                                        <textarea class="output code">${output}</textarea>
-                                    </span>
+                                <span class="result_grid">
+                                    <div>${inputHeader}:</div>
+                                    <div>${expectedHeader}:</div>
+                                    <div>${outputHeader}:</div>
+                                    <textarea class="input code">${input}</textarea>
+                                    <textarea class="expected code">${expected}</textarea>
+                                    <textarea class="output code">${output}</textarea>
                                 </span>`);
                                 }
 

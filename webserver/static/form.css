@@ -334,8 +334,10 @@ h1 {
     animation: fadein .3s ease forwards;
 }
 
-.result .data .line {
-    display: flex;
+.result .data .result_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 1em;
 }
 
 .result .data span {
