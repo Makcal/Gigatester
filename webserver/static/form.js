@@ -123,8 +123,22 @@ window.addEventListener("load", () => {
 
                             document.querySelector("#verdict").innerText = verdicts[json['code']];
                             document.querySelector("#verdict").classList.add(verdicts[json['code']].toLowerCase().replace(/ /g, "-"));
+
+                            function fadein_result() {
+                                let elem = document.querySelector(".result");
+                                elem.classList.add('fadein');
+                                setTimeout(
+                                    () => {
+                                        elem.style.opacity = '1';
+                                        elem.classList.remove('fadein');
+                                    },
+                                    300
+                                );
+                            }
+
                             document.querySelector(".data").innerHTML = "<span class='no_tests'>No tests to show.</span>";
                             if (json.code === 2) {
+                                fadein_result();
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}`;
                                 if (json['tests'] === 1) {
@@ -144,6 +158,7 @@ window.addEventListener("load", () => {
                                 </span>`);
                                 }
                             } else if (json.code === 1) {
+                                fadein_result();
                                 document.querySelector("#time").innerHTML = `Time: ${Math.round(json['time'] * 100) / 100}s`;
                                 document.querySelector("#tests").innerHTML = `Tests: ${json['tests']}  Successful: ${json['tests'] - json['input'].length}  Failed: ${json['input'].length}`;
                                 document.querySelector(".data").innerHTML = "";

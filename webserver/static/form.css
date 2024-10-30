@@ -266,11 +266,14 @@ h1 {
     display: none;
 }
 
-.wait .cooking,
-.res .result {
+.wait .cooking {
     display: block;
     opacity: 0;
     animation: fadein .3s ease forwards;
+}
+
+.res .result {
+    display: block;
 }
 
 @keyframes fadein {
@@ -331,6 +334,9 @@ h1 {
     max-height: 80%;
     overflow: auto;
     box-shadow: 0 0 15px #33333333;
+}
+
+.result.fadein {
     animation: fadein .3s ease forwards;
 }
 
