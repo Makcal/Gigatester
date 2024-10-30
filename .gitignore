@@ -159,12 +159,13 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-data/*
+data/
 !data/run.sh
-prog/*
-reference/*
+prog/
+queue/
+reference/
 webserver/config.json
-tester/tasks/*
+tester/tasks/
 !tester/tasks/__init__.py
 !tester/tasks/example.py
 !tester/tasks/task_base.py

@@ -30,5 +30,10 @@
             "id": "example_int",
             "name": "Example interactive"
         }
-    ]
+    ],
+    "secret": "TESTER_SECRET",
+    "queue_size": 350,
+    "max_registrations": 5,
+    "frontend_version": 1
 }
+

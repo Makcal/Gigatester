@@ -1,13 +1,21 @@
-import os
 import random
 import time
 from collections import defaultdict
 from typing import Annotated
 
 import uvicorn
-from fastapi import FastAPI, Request, status, Form, Cookie, BackgroundTasks, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import (
+    FastAPI,
+    status,
+    Request,
+    Form,
+    Body,
+    Cookie,
+    BackgroundTasks,
+    HTTPException,
+)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse
 
@@ -19,30 +27,28 @@ with open('config.json') as f:
 
 LANGUAGES = {lang.id: lang for lang in config.languages}
 TASKS = {t.id: t for t in config.tasks}
-
-VERSION_ID = "3"
-
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-init_web(app)
+SECRET = config.secret.get_secret_value()
+MAX_QUEUE = config.queue_size
+MAX_REG = config.max_registrations
+VERSION_ID = config.frontend_version
 
 queue: list[str] = []
 results: dict[str, Result] = {}
 regs = defaultdict(int)
 ban_list: list[str] = []
 
-SECRET = os.environ['SECRET']
-MAX_QUEUE = int(os.environ['MAX_QUEUE'])
-MAX_REG = int(os.environ['MAX_REG'])
-
+app = FastAPI()
 app.mount('/static', StaticFiles(directory="static"), name="static")
+# subapp for frontend middleware
+api = FastAPI()
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+init_web(app)
 
 
 def send_program(program_text: str, user: str, language: str, task: str):
@@ -52,13 +58,13 @@ def send_program(program_text: str, user: str, language: str, task: str):
     f.close()
 
 
-@app.middleware("http")
+@api.middleware("http")
 async def show_ip(request: Request, call_next):
     print(request.client.host if request.client is not None else 'No ip')
     return await call_next(request)
 
 
-@app.middleware("http")
+@api.middleware("http")
 async def reg(request: Request, call_next):
     if request.url.path.startswith('/static/form.html'):
         return await call_next(request)
@@ -82,7 +88,7 @@ async def reg(request: Request, call_next):
         return response
 
 
-@app.get("/")
+@api.get("/")
 async def redirect():
     return RedirectResponse(f"/static/form.html?v={VERSION_ID}")
 
@@ -92,12 +98,12 @@ API
 """
 
 
-@app.get('/task_list')
+@api.get('/task_list')
 async def get_task_list():
     return [(task.id, task.name) for task in TASKS.values()]
 
 
-@app.post('/submit')
+@api.post('/submit')
 async def form(background_tasks: BackgroundTasks,
                language: Annotated[str, Form()],
                task: Annotated[str, Form()],
@@ -121,7 +127,7 @@ async def form(background_tasks: BackgroundTasks,
     return response
 
 
-@app.get('/update', response_model_exclude_defaults=True)
+@api.get('/update', response_model_exclude_defaults=True)
 def update(user_id: Annotated[str | None, Cookie()] = None):
     if user_id is None:
         raise HTTPException(400)
@@ -133,7 +139,7 @@ def update(user_id: Annotated[str | None, Cookie()] = None):
         raise HTTPException(400)
 
 
-@app.get('/result', response_model_exclude_defaults=True)
+@api.get('/result', response_model_exclude_defaults=True)
 def result(user_id: Annotated[str | None, Cookie()] = None):
     if user_id is None:
         raise HTTPException(400)
@@ -142,26 +148,29 @@ def result(user_id: Annotated[str | None, Cookie()] = None):
     raise HTTPException(400)
 
 
-@app.websocket("/ws")
-async def internal(ws: WebSocket):
-    try:
-        await ws.accept()
-        token = await ws.receive_text()
-        if token != SECRET:
-            print("Bad token", flush=True)
-            await ws.close()
-        await ws.send_text("ok")
-        print("WS connected", flush=True)
-        while True:
-            data = await ws.receive_json()
-            user_id = data['user_id']
-            if user_id in queue:
-                queue.remove(user_id)
-                data['task'] = TASKS[data['task']].name
-                data['language'] = LANGUAGES[data['language']].name
-                results[user_id] = Result(**data)
-    except WebSocketDisconnect as e:
-        print(e)
+@app.post("/ws_hello", response_class=PlainTextResponse)
+async def ws_hello(token: Annotated[str, Body(embed=True)]) -> str:
+    if token != SECRET:
+        print("Bad token", flush=True)
+        raise HTTPException(401, "Invalid token")
+    return 'ok'
+
+
+@app.post("/ws", response_class=PlainTextResponse)
+async def internal(token: Annotated[str, Body()], data: dict) -> str:
+    if token != SECRET:
+        print("Bad token", flush=True)
+        raise HTTPException(401, "Invalid token")
+    user_id = data['user_id']
+    if user_id in queue:
+        queue.remove(user_id)
+        data['task'] = TASKS[data['task']].name
+        data['language'] = LANGUAGES[data['language']].name
+        results[user_id] = Result(**data)
+    return 'ok'
+
+
+app.mount("/", api)
 
 
 if __name__ == "__main__":

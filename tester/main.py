@@ -1,5 +1,4 @@
 import ctypes
-import json
 from multiprocessing import Event, Manager, Pipe, Process
 from multiprocessing.managers import ValueProxy
 import os
@@ -9,9 +8,9 @@ import select
 import shutil
 import time
 from typing import Any, Callable
+import logging
 
-from websockets import ConnectionClosed
-from websockets.sync.client import connect
+import requests
 
 from .exceptions import MyContainerError, MyTimeoutError
 from .interactive_task import (
@@ -25,6 +24,15 @@ from .results import *
 from .simple_task import AbsChecker, AbsGenerator, SimpleTask
 from .tasks.task_dict import TASK_DICT
 from .testers import AbsTester, TESTER_DICT
+
+
+SECRET = os.environ["SECRET"]
+logging.basicConfig()
+logger = logging.Logger('tester', os.environ.get("LOG_LEVEL", logging.DEBUG))
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s: %(message)s')
+log_handler = logging.StreamHandler()
+log_handler.formatter = formatter
+logger.addHandler(log_handler)
 
 
 def generate_input(generator: AbsGenerator, n: int):
@@ -296,70 +304,69 @@ def do_test(tester: AbsTester, task: SimpleTask | InteractiveTask, file: str) ->
         return Error("Critical error")
 
 
-SECRET = 'eb8d5498f143d53df55ce37fb3d944a3076f757b1268bfb4ce54959f3c2b5c1d'
-
-
 def main():
-    ws = None
     while True:
         try:
-            with connect("ws://0.0.0.0:80/ws") as ws:
-                ws.send(SECRET)
-                if ws.recv(3) != 'ok':
-                    raise Exception("Connection error")
-                print("Connected. Start scanning...", flush=True)
-                while True:
-                    ws.ping()
-                    queue = sorted(os.listdir('queue'))
-                    if len(queue) != 0:
-                        first = queue[0]
-                        # timestamp, user id, task, language
-                        tasks = '|'.join(t for t in TASK_DICT)
-                        langs = '|'.join(t for t in TESTER_DICT)
-                        match_ = re.match('[0-9]+_([0-9a-f]{64})_(%s)_(%s)\\.txt' % (tasks, langs), first)
-                        if not match_:
-                            print("Trash detected:", first)
-                            continue
-                        query_info = match_.groups()
-                        user_id = query_info[0]
-                        task = TASK_DICT[query_info[1]]
-                        tester = TESTER_DICT[query_info[2]] # type: ignore
+            logger.info("Connecting...")
+            while True:
+                try:
+                    hello = requests.post("http://0.0.0.0:80/ws_hello", json={'token': SECRET})
+                    if hello.text == 'ok':
+                        break
+                    raise RuntimeError("Authorization failed!")
+                except requests.RequestException as e:
+                    logger.warning(f"Connection failed ({type(e)}). Trying again...")
+                time.sleep(2)
+            logger.info("Authorized. Start scanning...")
 
-                        time_start = time.time()
-                        print(f"Do {query_info[1]} on {query_info[2]} for {user_id}", flush=True)
-                        resp = do_test(tester, task, first).to_dict()
+            while True:
+                queue = sorted(os.listdir('queue'))
+                if len(queue) != 0:
+                    first = queue[0]
+                    # timestamp, user id, task, language
+                    tasks = '|'.join(t for t in TASK_DICT)
+                    langs = '|'.join(t for t in TESTER_DICT)
+                    match_ = re.match('[0-9]+_([0-9a-f]{64})_(%s)_(%s)\\.txt' % (tasks, langs), first)
+                    if not match_:
+                        logger.error(f"Trash detected: {first}")
+                        time.sleep(2)
+                        continue
+                    query_info = match_.groups()
+                    user_id = query_info[0]
+                    task = TASK_DICT[query_info[1]]
+                    tester = TESTER_DICT[query_info[2]] # type: ignore
 
-                        resp['task'] = query_info[1]
-                        resp['language'] = query_info[2]
-                        resp['time'] = time.time() - time_start
-                        resp['user_id'] = user_id
-                        os.remove('queue/' + first)
+                    time_start = time.time()
+                    logger.info(f"Do {query_info[1]} on {query_info[2]} for {user_id}")
+                    resp = do_test(tester, task, first).to_dict()
+                    work_time = time.time() - time_start
+                    logger.info(f"Done: {work_time}")
 
-                        while True:
-                            try:
-                                ws.ping()
-                                ws.send(json.dumps(resp))
+                    resp['task'] = query_info[1]
+                    resp['language'] = query_info[2]
+                    resp['time'] = work_time
+                    resp['user_id'] = user_id
+                    os.remove('queue/' + first)
+
+                    while True:
+                        try:
+                            resp = requests.post("http://0.0.0.0/ws", json={'token': SECRET, 'data': resp})
+                            if resp.text == 'ok':
+                                logging.info("Submitted")
                                 break
-                            except ConnectionClosed as e:
-                                print("in_error", type(e), e)
-                                ws = connect("ws://0.0.0.0:80/ws")
-                                ws.send(SECRET)
-                                if ws.recv(3) != 'ok':
-                                    raise Exception("Connection error")
-                        print("Done", flush=True)
-                    time.sleep(1)
+                            logger.error(f"Can't submit: HTTP code {resp.status_code}")
+                        except requests.RequestException as e:
+                            logger.error(f"Can't submit: {type(e)} {e}")
+                time.sleep(1)
 
-        except ConnectionClosed as e:
-            print("Connection closed", e)
         except KeyboardInterrupt:
-            if ws is not None:
-                ws.close(reason="KeyboardInterrupt")
-            print("Stop")
+            logging.info("Stopped")
             exit()
         except Exception as e:
-            print("out_error", type(e), e)
+            logger.error(f"Error: {type(e)} {e}")
             time.sleep(3)
 
 
 if __name__ == '__main__':
     main()
+

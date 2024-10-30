@@ -5,10 +5,6 @@ services:
     image: makcal3000/gigatester-webserver
     ports:
       - "80:8000"
-    environment:
-      - SECRET=$SECRET
-      - MAX_QUEUE=350
-      - MAX_REG=5
     deploy:
       resources:
         limits:

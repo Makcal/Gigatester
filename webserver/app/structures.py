@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 
 class Language(BaseModel):
@@ -14,7 +14,10 @@ class Task(BaseModel):
 class Config(BaseModel):
     languages: list[Language]
     tasks: list[Task]
-
+    secret: SecretStr
+    queue_size: int
+    max_registrations: int
+    frontend_version: int
 
 class Update(BaseModel):
     code: int
