@@ -367,6 +367,8 @@ h1 {
     width: 100%;
     box-sizing: border-box;
     height: 200px;
+    overflow-x: auto;
+    text-wrap: nowrap;
 }
 
 .wrong-answer {
