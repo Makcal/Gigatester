@@ -26,7 +26,7 @@ class AbsCommunicator(ABC):
         pass
 
     @abstractmethod
-    def receive_line(self) -> str:
+    def receive_line(self, keep_newline: bool = False) -> str:
         pass
 
     @abstractmethod
@@ -68,10 +68,13 @@ class NamedPipeCommunicator(AbsCommunicator):
         self.pipe = None
 
     # analoge of `input()` - the only high-level way to handle input in Python (no scanners)
-    def receive_line(self) -> str:
+    def receive_line(self, keep_newline: bool = False) -> str:
         if self.pipe is None:
             raise RuntimeError("Start session first")
-        return self.pipe[0].readline()
+        line = self.pipe[0].readline()
+        if not keep_newline and line and line[-1] == '\n':
+            line = line[:-1]
+        return line
 
     def send(self, message: str, append_newline = True) -> None:
         if self.pipe is None:
@@ -105,8 +108,8 @@ class LoggingCommunicatorDecorator(AbsCommunicator):
     def finish(self):
         self.communicator.finish()
 
-    def receive_line(self) -> str:
-        message = self.communicator.receive_line()
+    def receive_line(self, keep_newline: bool = False) -> str:
+        message = self.communicator.receive_line(keep_newline)
         self.append_log(message)
         return message
 
