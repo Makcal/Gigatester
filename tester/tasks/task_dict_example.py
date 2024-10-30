@@ -7,8 +7,8 @@ from .example import (
 )
 
 if typing.TYPE_CHECKING:
-    from simple_task import SimpleTask
-    from interactive_task import InteractiveTask
+    from ..simple_task import SimpleTask
+    from ..interactive_task import InteractiveTask
 
 
 # Old tasks, generators, and checkers can be found in older commits.

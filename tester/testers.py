@@ -13,7 +13,7 @@ import docker
 import docker.errors
 from docker.models.containers import Container
 
-from exceptions import MyContainerError, MyTimeoutError
+from .exceptions import MyContainerError, MyTimeoutError
 
 
 TEST_SEPARATOR_PATTERN = "<<<ARBUZ{}ARBUZ>>>"

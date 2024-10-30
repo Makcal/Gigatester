@@ -1,8 +1,8 @@
 from typing import Any, Callable
-from tasks.task_base import TaskBase
+from ..tasks.task_base import TaskBase
 from .abs_interactor import AbsCommunicator, AbsInteractor
 from .environment import AbsEnvironmentGenerator, AbsEnvironmentPresenter
-from testers import AbsTester
+from ..testers import AbsTester
 
 
 class InteractiveTask(TaskBase):

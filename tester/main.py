@@ -13,18 +13,18 @@ from typing import Any, Callable
 from websockets import ConnectionClosed
 from websockets.sync.client import connect
 
-from exceptions import MyContainerError, MyTimeoutError
-from interactive_task import (
+from .exceptions import MyContainerError, MyTimeoutError
+from .interactive_task import (
     AbsCommunicator,
     AbsInteractor,
     InteractiveTask,
     LoggingCommunicatorDecorator,
     NamedPipeCommunicator,
 )
-from results import *
-from simple_task import AbsChecker, AbsGenerator, SimpleTask
-from tasks.task_dict import TASK_DICT
-from testers import AbsTester, TESTER_DICT
+from .results import *
+from .simple_task import AbsChecker, AbsGenerator, SimpleTask
+from .tasks.task_dict import TASK_DICT
+from .testers import AbsTester, TESTER_DICT
 
 
 def generate_input(generator: AbsGenerator, n: int):

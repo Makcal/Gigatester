@@ -1,10 +1,10 @@
 from random import randint
 from typing import Any
 
-from simple_task import AbsGenerator, SimpleTask
-from interactive_task import AbsEnvironmentGenerator, AbsLoggingInteractor, AbsEnvironmentPresenter, InteractiveTask
-from simple_task import ComparisonChecker
-from testers import TESTER_DICT
+from ..simple_task import AbsGenerator, SimpleTask
+from ..interactive_task import AbsEnvironmentGenerator, AbsLoggingInteractor, AbsEnvironmentPresenter, InteractiveTask
+from ..simple_task import ComparisonChecker
+from ..testers import TESTER_DICT
 
 
 class ExampleGenerator(AbsGenerator):

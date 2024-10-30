@@ -1,10 +1,10 @@
 import typing
 
-from tasks.task_base import TaskBase
+from ..tasks.task_base import TaskBase
 
 if typing.TYPE_CHECKING:
     from .abs_generator import AbsGenerator
-    from testers import AbsTester
+    from ..testers import AbsTester
     from .checkers import AbsChecker
 
 

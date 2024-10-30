@@ -2,7 +2,7 @@ import pathlib
 import typing
 
 if typing.TYPE_CHECKING:
-    from testers import AbsTester
+    from ..testers import AbsTester
 
 
 class TaskBase:
