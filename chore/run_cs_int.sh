@@ -18,9 +18,8 @@ for i in $(seq 0 $(($1-1)))
 do
    {
      cat /data/to_cont > /dev/null
-     >&2 echo '<<<ARBUZ'"$i"'ARBUZ>>>'
-     ./build/main </data/prog_in >/data/prog_out 2>&1 &
-     disown 2> /dev/null
+     echo '<<<ARBUZ'"$i"'ARBUZ>>>'
+     ./build/main </data/prog_in >/data/prog_out &
      cat /data/to_cont > /dev/null
      kill $! 2> /dev/null || true
    } || true

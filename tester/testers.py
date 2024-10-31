@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from multiprocessing.synchronize import Event
 from multiprocessing.connection import Connection
 import os
 from os import PathLike
@@ -12,22 +11,24 @@ from typing import Callable, Literal
 import docker
 import docker.errors
 from docker.models.containers import Container
+import requests
 
 from .exceptions import MyContainerError, MyTimeoutError
 
 
 TEST_SEPARATOR_PATTERN = "<<<ARBUZ{}ARBUZ>>>"
 
-def _parse_log_per_test(
+def split_log_by_tests(
         log: str,
         output: list[str],
         n_tests: int,
-        separator_pattern: str,
-        check_function: Callable[[str], bool]
-):
+        check_function: Callable[[str], bool] = bool,
+        separator_pattern: str = TEST_SEPARATOR_PATTERN,
+) -> list[str]:
     """
     Parses log and prepends it to output
     """
+    output = output.copy()
     p = 0
     for i in range(n_tests):
         separator = separator_pattern.format(i)
@@ -40,8 +41,9 @@ def _parse_log_per_test(
             p_next = len(log)
         extra = log[p:p_next].strip()
         if check_function(extra):
-            output[i] = extra + '\n\n' + output[i]
+            output[i] += extra + '\n\n'
         p = p_next
+    return output
 
 
 class AbsTester(ABC):
@@ -71,7 +73,6 @@ class AbsTester(ABC):
             n_tests: int,
             timeout: int,
             file_name: PathLike[str],
-            stop: Event,
             log_pipe: Connection | None = None,
     ) -> str:
         self.clean()
@@ -80,10 +81,9 @@ class AbsTester(ABC):
         container: Container | None = None
         try:
             container = self.start_interactive_container(n_tests)
-            stop.wait(timeout)
-            time.sleep(0.1)
-            container.reload()
-            if container.status != 'exited':
+            try:
+                container.wait(timeout=timeout)
+            except requests.exceptions.ReadTimeout:
                 raise MyTimeoutError()
 
             log = container.logs().decode()
@@ -208,8 +208,7 @@ class CppTester(AbsTester):
 
     def process_log(self, outputs: list[str], log: str) -> list[str]:
         # Add segmentation faults etc. from the log
-        _parse_log_per_test(log, outputs, len(outputs), TEST_SEPARATOR_PATTERN, lambda extra: bool(extra))
-        return outputs
+        return split_log_by_tests(log, outputs, len(outputs))
 
     def setup_interactive(self, file_name: PathLike[str]):
         self.copy_script_and_code(file_name, 'run_cpp_int.sh', 'main.cpp')
@@ -236,14 +235,12 @@ class CSharpTester(AbsTester):
     def process_log(self, outputs: list[str], log: str) -> list[str]:
         # Add errors etc. from the log
         # Exclude 'core dumped' since dotnet prints its own error message
-        _parse_log_per_test(
+        return split_log_by_tests(
             log,
             outputs,
             len(outputs),
-            TEST_SEPARATOR_PATTERN,
             lambda extra: bool(extra) and 'core dumped' not in extra,
         )
-        return outputs
 
     def setup_interactive(self, file_name: PathLike[str]):
         self.copy_script_and_code(file_name, 'run_cs_int.sh', 'main.cs')
@@ -297,4 +294,4 @@ TESTER_DICT: dict[Literal['java', 'cpp17', 'cpp20', 'cs', 'py'], AbsTester] = {
     'py': py_tester,
 }
 
-__all__ = ['AbsTester', 'TESTER_DICT']
+__all__ = ['AbsTester', 'TESTER_DICT', 'split_log_by_tests']

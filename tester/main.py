@@ -23,7 +23,7 @@ from .interactive_task import (
 from .results import *
 from .simple_task import AbsChecker, AbsGenerator, SimpleTask
 from .tasks.task_dict import TASK_DICT
-from .testers import AbsTester, TESTER_DICT
+from .testers import AbsTester, TESTER_DICT, split_log_by_tests
 
 
 SECRET = os.environ["SECRET"]
@@ -145,7 +145,6 @@ def run_interactive_program(
     interactor_communicator = NamedPipeCommunicator()
     interactor_communicator.setup()
 
-    stop_container = Event()
     log_pipe_read, log_pipe_write = Pipe(duplex=False)
     start_timeout = 15 if tester is not TESTER_DICT['cs'] else 25
     container_manager = Process(
@@ -154,7 +153,6 @@ def run_interactive_program(
             n_tests,
             start_timeout + one_timeout * 2 * n_tests,
             file,
-            stop_container,
             log_pipe_write,
         ),
     )
@@ -165,14 +163,13 @@ def run_interactive_program(
             raise RuntimeError('Container has not started')
         container_message = container_message.strip()
         if container_message == "CompilationError":
-            stop_container.set()
             if log_pipe_read.poll(5):
                 return [(False, log_pipe_read.recv())] * n_tests
             raise MyContainerError("")
         elif container_message != "Start":
             raise MyContainerError(container_message)
 
-        results = []
+        results: list[tuple[bool, str]] = []
         for i in range(len(environments)):
             with open('data/to_cont', 'w') as p:
                 p.write('next\n')
@@ -201,10 +198,12 @@ def run_interactive_program(
                 with open('data/to_cont', 'w') as p:
                     p.write('stop')
 
+        if log_pipe_read.poll(1):
+            full_outputs = split_log_by_tests(log_pipe_read.recv(), [r[1] for r in results], n_tests)
+            results = [(results[i][0], full_outputs[i]) for i in range(len(results))]
         return results
 
     finally:
-        stop_container.set()
         container_manager.join()
 
 
