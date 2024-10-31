@@ -232,7 +232,7 @@ def test_interactive(task: InteractiveTask, tester: AbsTester, file: str) -> Tes
                 task.reference_file
             )[0]
             if not correct_example[0]:
-                print("Reference program {task.reference_file} failed")
+                logger.error(f"Reference program {task.reference_file} failed")
             return Difference(
                 1,
                 [task.env_to_string(environment) or ""],
@@ -270,7 +270,7 @@ def test_interactive(task: InteractiveTask, tester: AbsTester, file: str) -> Tes
         task.reference_file,
     )
     if not all(map(lambda r: r[0], correct)):
-        print("Reference program {task.reference_file} failed")
+        logger.error(f"Reference program {task.reference_file} failed")
     return Difference(
         task.n_tests,
         [task.env_to_string(er[0]) or "" for er in errored_results],
@@ -295,12 +295,12 @@ def do_test(tester: AbsTester, task: SimpleTask | InteractiveTask, file: str) ->
             case InteractiveTask():
                 return test_interactive(task, tester, file)
     except MyContainerError as e:
-        print("ContainerError", e)
+        logger.error(f"ContainerError {e}")
         return Error(e.message)
     except MyTimeoutError:
         return Timeout(task.n_tests)
     except Exception as e:
-        print("Critical error", type(e), e)
+        logger.error(f"Critical error {type(e)} {e}")
         return Error("Critical error")
 
 
@@ -352,7 +352,7 @@ def main():
                         try:
                             resp = requests.post("http://0.0.0.0/ws", json={'token': SECRET, 'data': resp})
                             if resp.text == 'ok':
-                                logging.info("Submitted")
+                                logger.info("Submitted")
                                 break
                             logger.error(f"Can't submit: HTTP code {resp.status_code}")
                         except requests.RequestException as e:
@@ -360,7 +360,7 @@ def main():
                 time.sleep(1)
 
         except KeyboardInterrupt:
-            logging.info("Stopped")
+            logger.info("Stopped")
             exit()
         except Exception as e:
             logger.error(f"Error: {type(e)} {e}")
