@@ -128,6 +128,19 @@ def timeout_read(source: str, timeout: float) -> str | None:
     return None
 
 
+def nonblocking_write(fifo: str, message: str) -> bool:
+    fd = None
+    try:
+        fd = os.open(fifo, os.O_NONBLOCK | os.O_WRONLY)
+        os.write(fd, message.encode())
+        return True
+    except OSError:
+        return False
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
 def run_interactive_program(
         n_tests: int,
         environments: list[Any],
@@ -170,9 +183,15 @@ def run_interactive_program(
             raise MyContainerError(container_message)
 
         results: list[tuple[bool, str]] = []
+        error = False  # container suddenly has stopped
         for i in range(len(environments)):
-            with open('data/to_cont', 'w') as p:
-                p.write('next\n')
+            if error:
+                results.append((False, "Error"))
+                continue
+            if not nonblocking_write('data/to_cont', 'next\n'):
+                error = True
+                results.append((False, "Error"))
+                continue
             with Manager() as manager:
                 log = manager.Value(ctypes.c_wchar_p, "")
                 success = manager.Value(ctypes.c_bool, False)
@@ -195,8 +214,8 @@ def run_interactive_program(
                     results.append((False, log.value + "\nTimeout..."))
                 else:
                     results.append((success.value, log.value))
-                with open('data/to_cont', 'w') as p:
-                    p.write('stop')
+                if not nonblocking_write('data/to_cont', 'next\n'):
+                    error = True
 
         if log_pipe_read.poll(1):
             full_outputs = split_log_by_tests(log_pipe_read.recv(), [r[1] for r in results], n_tests)
