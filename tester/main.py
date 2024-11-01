@@ -151,7 +151,7 @@ def run_interactive_program(
         target=tester.start_interactive,
         args=(
             n_tests,
-            start_timeout + one_timeout * 2 * n_tests,
+            start_timeout + int(one_timeout * 1.5 * n_tests),
             file,
             log_pipe_write,
         ),
