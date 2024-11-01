@@ -128,17 +128,21 @@ def timeout_read(source: str, timeout: float) -> str | None:
     return None
 
 
-def nonblocking_write(fifo: str, message: str) -> bool:
+def nonblocking_write(fifo: str, timeout: int, message: str) -> bool:
     fd = None
-    try:
-        fd = os.open(fifo, os.O_NONBLOCK | os.O_WRONLY)
-        os.write(fd, message.encode())
-        return True
-    except OSError:
-        return False
-    finally:
-        if fd is not None:
-            os.close(fd)
+    start = time.time()
+    while time.time() < start + timeout:
+        try:
+            fd = os.open(fifo, os.O_NONBLOCK | os.O_WRONLY)
+            os.write(fd, message.encode())
+            return True
+        except OSError:
+            pass
+        finally:
+            if fd is not None:
+                os.close(fd)
+        time.sleep(0.5)
+    return False
 
 
 def run_interactive_program(
@@ -188,7 +192,7 @@ def run_interactive_program(
             if error:
                 results.append((False, "Error"))
                 continue
-            if not nonblocking_write('data/to_cont', 'next\n'):
+            if not nonblocking_write('data/to_cont', 5, 'next\n'):
                 error = True
                 results.append((False, "Error"))
                 continue
@@ -214,7 +218,7 @@ def run_interactive_program(
                     results.append((False, log.value + "\nTimeout..."))
                 else:
                     results.append((success.value, log.value))
-                if not nonblocking_write('data/to_cont', 'next\n'):
+                if not nonblocking_write('data/to_cont', 5, 'next\n'):
                     error = True
 
         if log_pipe_read.poll(1):
