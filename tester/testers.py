@@ -83,7 +83,7 @@ class AbsTester(ABC):
             container = self.start_interactive_container(n_tests)
             try:
                 container.wait(timeout=timeout)
-            except requests.exceptions.ReadTimeout:
+            except requests.exceptions.RequestException:
                 raise MyTimeoutError()
 
             log = container.logs().decode()
