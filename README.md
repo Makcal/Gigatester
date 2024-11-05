@@ -27,7 +27,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable gigatester
 sudo systemctl enable gigaweb
 sudo systemctl start gigatester
-sudo systemctl enable gigatester
 ```
 
 6. [Optional] You can always check logs via:
